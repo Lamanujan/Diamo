@@ -107,14 +107,9 @@
   </section>
 
   <div class="lightbox" id="lightbox">
-  <button onclick="closeLightbox()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer;">&times;</button>
-  <div class="lightbox-slider" style="display:flex; align-items:center; gap:10px; max-width:90vw; overflow-x:auto;">
-    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/project1.jpg" style="max-height:80vh;" alt="Project 1" />
-    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p2.jpg" style="max-height:80vh;" alt="Project 2" />
-    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p3.jpg" style="max-height:80vh;" alt="Project 3" />
-    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p4.jpg" style="max-height:80vh;" alt="Project 4" />
+    <button onclick="closeLightbox()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer;">&times;</button>
+    <img id="slide-img" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/project1.jpg" style="max-height:80vh;" alt="Slide Image" />
   </div>
-</div>
 
   <footer class="footer">
     <div style="text-align: center;">
@@ -127,53 +122,104 @@
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init();
+    let currentIndex = 0;
+    const images = [
+      "https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/project1.jpg",
+      "https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p2.jpg",
+      "https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p3.jpg",
+      "https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p4.jpg"
+    ];
+
     function openLightbox(src) {
-  document.getElementById('lightbox').style.display = 'flex';
-  const images = document.querySelectorAll('.lightbox-slider img');
-  images.forEach((img) => {
-    if (img.src === src) {
-      img.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      const lightbox = document.getElementById('lightbox');
+      lightbox.style.display = 'flex';
+      currentIndex = images.indexOf(src);
+      document.getElementById('slide-img').src = images[currentIndex];
+
+      // 마우스 클릭 이벤트
+      lightbox.onmousedown = function(e) {
+        if (e.button === 0) prevSlide(); // 왼쪽 클릭
+        if (e.button === 2) nextSlide(); // 오른쪽 클릭
+      };
+
+      // 스와이프 이벤트 (PC + 모바일)
+      let startX = 0;
+      let dragging = false;
+
+      const pointerDownHandler = function(e) {
+        startX = e.clientX;
+        dragging = true;
+      };
+
+      const pointerMoveHandler = function(e) {
+        if (!dragging) return;
+        const deltaX = e.clientX - startX;
+        if (Math.abs(deltaX) > 50) {
+          if (deltaX > 0) prevSlide();
+          else nextSlide();
+          dragging = false;
+        }
+      };
+
+      const pointerUpHandler = function() {
+        dragging = false;
+      };
+
+      lightbox.addEventListener('pointerdown', pointerDownHandler);
+      lightbox.addEventListener('pointermove', pointerMoveHandler);
+      lightbox.addEventListener('pointerup', pointerUpHandler);
     }
-  });
-}
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % images.length;
+      document.getElementById('slide-img').src = images[currentIndex];
+    }
+
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      document.getElementById('slide-img').src = images[currentIndex];
+    }
+
     function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
+      const lightbox = document.getElementById('lightbox');
+      lightbox.style.display = 'none';
+      lightbox.onmousedown = null;
     }
   </script>
-<div id="contact-popup" style="display:none; position:fixed; bottom:20px; left:20px; width:250px; background:#fff; border:1px solid #ccc; padding:15px; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:1000;">
-  <h3 style="margin-bottom:10px;">Contact Us</h3>
-  <input type="text" placeholder="Your Name" style="width:100%; margin-bottom:10px; padding:5px;">
-  <input type="text" placeholder="Your Number" style="width:100%; margin-bottom:10px; padding:5px;">
-  <textarea placeholder="Your Message" style="width:100%; margin-bottom:10px; padding:5px;"></textarea>
-  <button onclick="sendEmail()" style="margin-top:10px; width:100%; padding:8px; background:#333; color:#fff; border:none; cursor:pointer;">Send</button>
-</div>
 
-<script>
-  function togglePopup(event) {
-    event.preventDefault();
-    const popup = document.getElementById('contact-popup');
-    popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
-  }
-  function sendEmail() {
-    const name = document.querySelector('#contact-popup input[placeholder="Your Name"]').value;
-    const number = document.querySelector('#contact-popup input[placeholder="Your Number"]').value;
-    const message = document.querySelector('#contact-popup textarea').value;
+  <div id="contact-popup" style="display:none; position:fixed; bottom:20px; left:20px; width:250px; background:#fff; border:1px solid #ccc; padding:15px; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:1000;">
+    <h3 style="margin-bottom:10px;">Contact Us</h3>
+    <input type="text" placeholder="Your Name" style="width:100%; margin-bottom:10px; padding:5px;">
+    <input type="text" placeholder="Your Number" style="width:100%; margin-bottom:10px; padding:5px;">
+    <textarea placeholder="Your Message" style="width:100%; margin-bottom:10px; padding:5px;"></textarea>
+    <button onclick="sendEmail()" style="margin-top:10px; width:100%; padding:8px; background:#333; color:#fff; border:none; cursor:pointer;">Send</button>
+  </div>
 
-    emailjs.send("service_12ehn7t", "template_2jcmp9n", {
-      from_name: name,
-      contact_number: number,
-      message: message
-    }, "9YqLj0sQHeKA9XkIJ")
-    .then(() => alert("메시지가 전송되었습니다!"))
-    .catch((error) => alert("전송 실패: " + error));
-  }
+  <script>
+    function togglePopup(event) {
+      event.preventDefault();
+      const popup = document.getElementById('contact-popup');
+      popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+    }
+    function sendEmail() {
+      const name = document.querySelector('#contact-popup input[placeholder="Your Name"]').value;
+      const number = document.querySelector('#contact-popup input[placeholder="Your Number"]').value;
+      const message = document.querySelector('#contact-popup textarea').value;
 
-</script>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-  (function(){
-    emailjs.init("9YqLj0sQHeKA9XkIJ");
-  })();
-</script>
+      emailjs.send("service_12ehn7t", "template_2jcmp9n", {
+        from_name: name,
+        contact_number: number,
+        message: message
+      }, "9YqLj0sQHeKA9XkIJ")
+      .then(() => alert("메시지가 전송되었습니다!"))
+      .catch((error) => alert("전송 실패: " + error));
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("9YqLj0sQHeKA9XkIJ");
+    })();
+  </script>
 </body>
 </html>
