@@ -106,25 +106,36 @@
     </div>
   </section>
 
-  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="Expanded image">
+  <div class="lightbox" id="lightbox">
+  <button onclick="closeLightbox()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer;">&times;</button>
+  <div class="lightbox-slider" style="display:flex; align-items:center; gap:10px; max-width:90vw; overflow-x:auto;">
+    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/project1.jpg" style="max-height:80vh;" alt="Project 1" />
+    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p2.jpg" style="max-height:80vh;" alt="Project 2" />
+    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p3.jpg" style="max-height:80vh;" alt="Project 3" />
+    <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/p4.jpg" style="max-height:80vh;" alt="Project 4" />
   </div>
+</div>
 
   <footer class="footer">
     <div style="text-align: center;">
       <p>&copy; 2025 Diamo. All rights reserved.</p>
     </div>
-    <a href="https://www.instagram.com/_eldkah/" target="_blank"><i class="fab fa-instagram"></i></a>
-    <a href="https://m.blog.naver.com/qowlans1211" target="_blank"><i class="fas fa-blog"></i></a>
+    <a href="https://www.instagram.com/_eldkah/" target="_blank" style="background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;" title="Instagram"><i class="fab fa-instagram"></i></a>
+    <a href="https://m.blog.naver.com/qowlans1211" target="_blank" style="color: #1EC800;" title="Naver Blog"><i class="fas fa-blog"></i></a>
   </footer>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init();
     function openLightbox(src) {
-      document.getElementById('lightbox-img').src = src;
-      document.getElementById('lightbox').style.display = 'flex';
+  document.getElementById('lightbox').style.display = 'flex';
+  const images = document.querySelectorAll('.lightbox-slider img');
+  images.forEach((img) => {
+    if (img.src === src) {
+      img.scrollIntoView({ behavior: 'smooth', inline: 'center' });
     }
+  });
+}
     function closeLightbox() {
       document.getElementById('lightbox').style.display = 'none';
     }
