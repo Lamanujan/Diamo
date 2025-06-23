@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Diamo Clone</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Pretendard&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -18,34 +17,42 @@
       line-height: 1.8;
       font-size: 1.1rem;
     }
-    .header { background: #f5f5f5; padding: 20px; position: sticky; top: 0; }
+    .header {
+  background: #f5f5f5;
+  padding: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
     .nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
       max-width: 1200px;
       margin: auto;
-      flex-wrap: wrap;
     }
     .logo {
       font-size: 2rem;
       font-weight: 700;
-      font-family: 'Playfair Display', serif;
       color: #111;
     }
-    .nav-links { list-style: none; display: flex; gap: 20px; }
-    .nav-links a {
-      text-decoration: none;
-      color: #333;
-      font-size: 1.1rem;
-      font-weight: 500;
-    }
     .hero {
-      background: #e0e0e0;
-      padding: 120px 20px;
-      text-align: center;
+  background: #e0e0e0;
+  padding: 100px 20px;
+  text-align: center;
+}
+.hero h1 {
+  font-size: 3rem;
+}
+.hero p {
+  font-size: 1.3rem;
+}
+    .section {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: auto;
     }
-    .section { padding: 60px 20px; max-width: 1000px; margin: auto; }
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -57,55 +64,110 @@
       text-align: center;
     }
     .project img {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      display: block;
-      cursor: pointer;
-    }
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.project img:hover {
+  transform: scale(1.03);
+}
     .lightbox {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.9);
-      justify-content: center;
-      align-items: center;
-    }
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
     .lightbox img {
-      max-width: 90vw;
-      max-height: 90vh;
+  max-width: 90vw;
+  max-height: 80vh;
+  position: relative;
+  z-index: 900;
+}
+    .close-btn {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 1100;
+}
+    .arrow {
+      position: absolute;
+      top: 50%;
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+      user-select: none;
     }
-    .footer {
-      text-align: left;
-      padding: 40px 20px;
-      background: #f5f5f5;
+    .arrow.left { left: 20px; }
+    .arrow.right { right: 20px; }
+    .dots {
+      margin-top: 20px;
     }
-    .footer a {
-      color: #333;
+    .dots span {
+      height: 10px;
+      width: 10px;
+      margin: 0 5px;
+      background-color: #bbb;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dots .active {
+      background-color: #717171;
+    }
+      .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+    .nav-links a {
       text-decoration: none;
-      margin-left: 10px;
-      font-size: 1.3rem;
-      font-weight: 600;
+      color: #333;
+      font-size: 1.1rem;
+      font-weight: 500;
     }
-    @keyframes flash {
-      0%, 100% { box-shadow: 0 0 10px rgba(0, 128, 0, 0.7); }
-      50% { box-shadow: 0 0 30px rgba(0, 255, 0, 1); }
+    @media (max-width: 768px) {
+      .nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px;
+      }
+      .nav-links {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .hero {
+        padding: 60px 10px;
+      }
+      .section {
+        padding: 40px 10px;
+      }
+      .project img {
+        aspect-ratio: auto;
+      }
+      #contact-popup {
+        width: 90%;
+        left: 5%;
+        bottom: 10px;
+      }
+      .close-btn,
+      .arrow {
+        font-size: 28px;
+      }
     }
-    @keyframes popupFlash {
-      0% { box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
-      50% { box-shadow: 0 0 20px rgba(100, 100, 100, 0.5); }
-      100% { box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
-    }
-    .flashable.flash-effect {
-      animation: popupFlash 0.6s ease-in-out 1;
-    }
-  </style>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>emailjs.init("9YqLj0sQHeKA9XkIJ");</script>
+</style>
 </head>
 <body>
   <header class="header">
@@ -117,46 +179,92 @@
     </nav>
   </header>
 
-  <section class="hero" data-aos="fade-up">
+  <section class="hero">
     <h1>Welcome to DIAMO</h1>
     <p>Architecture. Design. Artistry.</p>
   </section>
 
   <section class="section">
-    <h2 data-aos="fade-up">Projects</h2>
+    <h2>Projects</h2>
     <div class="projects-grid">
-      <div class="project" data-aos="zoom-in">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/w/hw.jpg" alt="웨딩" onclick="openGallery('w')">
+      <div class="project">
+        <img loading="lazy" width="300" height="300" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/w/hw.jpg" alt="웨딩" onclick="openGallery('w')">
         웨딩
       </div>
-      <div class="project" data-aos="zoom-in">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/b/hb.jpg" alt="돌잔치" onclick="openGallery('b')">
+      <div class="project">
+        <img loading="lazy" width="300" height="300" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/b/hb.jpg" alt="돌잔치" onclick="openGallery('b')">
         돌잔치
       </div>
-      <div class="project" data-aos="zoom-in">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/s/hs.jpg" alt="칠순팔순" onclick="openGallery('s')">
+      <div class="project">
+        <img loading="lazy" width="300" height="300" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/s/hs.jpg" alt="칠순팔순" onclick="openGallery('s')">
         칠순팔순
       </div>
-      <div class="project" data-aos="zoom-in">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/m/hm.jpg" alt="모임/세미나" onclick="openGallery('m')">
+      <div class="project">
+        <img loading="lazy" width="300" height="300" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/m/hm.jpg" alt="모임/세미나" onclick="openGallery('m')">
         모임/세미나
       </div>
     </div>
   </section>
 
   <div class="lightbox" id="lightbox">
+    <span class="close-btn" onclick="closeLightbox()">&times;</span>
     <img id="lightbox-img" src="" alt="Expanded image">
+    <div class="arrow left" onclick="prevImage()">&#10094;</div>
+    <div class="arrow right" onclick="nextImage()">&#10095;</div>
+    <div class="dots" id="lightbox-dots"></div>
   </div>
 
-  <footer class="footer">
-    <div style="text-align: center;">
-      <p>&copy; 2025 Diamo. All rights reserved.</p>
-    </div>
-    <a href="https://www.instagram.com/_eldkah/" target="_blank" style="background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;"><i class="fab fa-instagram"></i></a>
-    <a href="https://m.blog.naver.com/qowlans1211" target="_blank" style="color: #1EC800; font-weight: bold;"><i class="fas fa-blog"></i></a>
-  </footer>
+  <script>
+    let galleryImages = [];
+    let galleryIndex = 0;
 
+    function openGallery(prefix) {
+      galleryImages = [];
+      for (let i = 1; i <= 5; i++) {
+        galleryImages.push(`https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i}).jpg`);
+      }
+      galleryIndex = 0;
+      updateLightbox();
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    function prevImage() {
+      galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
+      updateLightbox();
+    }
+
+    function nextImage() {
+      galleryIndex = (galleryIndex + 1) % galleryImages.length;
+      updateLightbox();
+    }
+
+    function updateLightbox() {
+      document.getElementById('lightbox-img').src = galleryImages[galleryIndex];
+      updateDots();
+    }
+
+    function updateDots() {
+      const dotsContainer = document.getElementById('lightbox-dots');
+      dotsContainer.innerHTML = '';
+      galleryImages.forEach((_, i) => {
+        const dot = document.createElement('span');
+        if (i === galleryIndex) dot.classList.add('active');
+        dotsContainer.appendChild(dot);
+      });
+    }
+  document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeLightbox();
+    closeContact();
+  }
+});
+</script>
   <div id="contact-popup" style="display:none; position:fixed; bottom:20px; left:20px; width:250px; background:#fff; border:1px solid #ccc; padding:15px; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:1000;">
+    <span class="close-btn" onclick="closeContact()" style="position:absolute; top:10px; right:10px; background:#f0f0f0; color:#333; font-size:16px; font-weight:600; border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); cursor:pointer;">&times;</span>
     <h3 style="margin-bottom:10px;">문의하기</h3>
     <input type="text" placeholder="이름" style="width:100%; margin-bottom:10px; padding:5px;">
     <input type="text" placeholder="전화번호" style="width:100%; margin-bottom:10px; padding:5px;">
@@ -164,101 +272,56 @@
     <button onclick="sendEmail()" style="margin-top:10px; width:100%; padding:8px; background:#333; color:#fff; border:none; cursor:pointer;">전송하기</button>
   </div>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-  AOS.init();
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    emailjs.init("9YqLj0sQHeKA9XkIJ");
 
-  document.getElementById('contact-link').addEventListener('click', function(event) {
-    event.preventDefault();
-    const popup = document.getElementById('contact-popup');
-    popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
-  });
+    function closeContact() {
+      document.getElementById('contact-popup').style.display = 'none';
+    }
 
-  function sendEmail() {
-    const name = document.querySelector('#contact-popup input[placeholder="이름"]').value;
-    const number = document.querySelector('#contact-popup input[placeholder="전화번호"]').value;
-    const message = document.querySelector('#contact-popup textarea').value;
+    document.getElementById('contact-link').addEventListener('click', function(event) {
+      event.preventDefault();
+      const popup = document.getElementById('contact-popup');
+      popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+    });
 
-    const button = document.querySelector('#contact-popup button');
-    button.innerText = '전송 중...';
-    button.disabled = true;
-    button.style.opacity = '0.6';
+    function sendEmail() {
+      const name = document.querySelector('#contact-popup input[placeholder="이름"]').value;
+      const number = document.querySelector('#contact-popup input[placeholder="전화번호"]').value;
+      const message = document.querySelector('#contact-popup textarea').value;
 
-    emailjs.send("service_12ehn7t", "template_2jcmp9n", {
-      from_name: name,
-      contact_number: number,
-      message: message
-    }, "9YqLj0sQHeKA9XkIJ")
-    .then(function(response) {
-      button.innerText = '전송이 완료되었습니다';
-      setTimeout(() => {
+      const button = document.querySelector('#contact-popup button');
+      button.innerText = '전송 중...';
+      button.disabled = true;
+      button.style.opacity = '0.6';
+
+      emailjs.send("service_12ehn7t", "template_2jcmp9n", {
+        from_name: name,
+        contact_number: number,
+        message: message
+      }, "9YqLj0sQHeKA9XkIJ")
+      .then(function(response) {
+        button.innerText = '전송이 완료되었습니다';
+        setTimeout(() => {
+          button.innerText = '전송하기';
+          button.disabled = false;
+          button.style.opacity = '1';
+        }, 2000);
+      }, function(error) {
+        alert("전송에 실패했습니다. 다시 시도해주세요.");
         button.innerText = '전송하기';
         button.disabled = false;
         button.style.opacity = '1';
-      }, 2000);
-    }, function(error) {
-      alert("전송에 실패했습니다. 다시 시도해주세요.");
-      button.innerText = '전송하기';
-      button.disabled = false;
-      button.style.opacity = '1';
-    });
-  }
-</script>
-<script>
-    AOS.init();
-
-    function openGallery(prefix) {
-      const images = [];
-      for (let i = 1; i <= 5; i++) {
-        const url = `https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i}).jpg`;
-        images.push(url);
-      }
-      let index = 0;
-      const lightbox = document.getElementById('lightbox');
-      const lightboxImg = document.getElementById('lightbox-img');
-      lightboxImg.src = images[index];
-      lightbox.style.display = 'flex';
-
-      function showImage(i) {
-        if (images[i]) {
-          lightboxImg.src = images[i];
-          index = i;
-        }
-      }
-
-      lightbox.onclick = () => lightbox.style.display = 'none';
-      lightboxImg.onclick = (e) => {
-        e.stopPropagation();
-        index = (index + 1) % images.length;
-        showImage(index);
-      };
-
-      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let swipeHandled = false;
-
-        lightbox.addEventListener('touchstart', (e) => {
-          touchStartX = e.changedTouches[0].screenX;
-          swipeHandled = false;
-        }, { passive: true });
-
-        lightbox.addEventListener('touchmove', (e) => {
-          touchEndX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        lightbox.addEventListener('touchend', (e) => {
-          if (swipeHandled) return;
-          const diff = touchEndX - touchStartX;
-          if (Math.abs(diff) > 50) {
-            if (diff < 0) index = (index + 1) % images.length;
-            else index = (index - 1 + images.length) % images.length;
-            showImage(index);
-            swipeHandled = true;
-          }
-        }, { passive: true });
-      }
+      });
     }
   </script>
+  <footer class="footer" style="display: flex; justify-content: center; align-items: center; position: relative; padding: 40px 20px; background: #f5f5f5; text-align: center;">
+  <div style="position: absolute; left: 20px;">
+    <a href="https://www.instagram.com/_eldkah/" target="_blank" style="background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; font-size: 1.5rem; margin-right: 10px;"><i class="fab fa-instagram"></i></a>
+    <a href="https://m.blog.naver.com/qowlans1211" target="_blank" style="color: #1EC800; font-weight: bold; font-size: 1.5rem;"><i class="fas fa-blog"></i></a>
+  </div>
+  <p style="margin: 0;">&copy; 2025 Diamo. All rights reserved.</p>
+</footer>
 </body>
 </html>
