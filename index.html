@@ -18,13 +18,13 @@
       font-size: 1.1rem;
     }
     .header {
-  background: #f5f5f5;
-  padding: 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
+      background: #f5f5f5;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
     .nav {
       display: flex;
       justify-content: space-between;
@@ -38,16 +38,16 @@
       color: #111;
     }
     .hero {
-  background: #e0e0e0;
-  padding: 100px 20px;
-  text-align: center;
-}
-.hero h1 {
-  font-size: 3rem;
-}
-.hero p {
-  font-size: 1.3rem;
-}
+      background: #e0e0e0;
+      padding: 100px 20px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+    }
+    .hero p {
+      font-size: 1.3rem;
+    }
     .section {
       padding: 60px 20px;
       max-width: 1000px;
@@ -64,44 +64,57 @@
       text-align: center;
     }
     .project img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  display: block;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-.project img:hover {
-  transform: scale(1.03);
-}
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .project img:hover {
+      transform: scale(1.03);
+    }
     .lightbox {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.9);
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-    .lightbox img {
-  max-width: 90vw;
-  max-height: 80vh;
-  position: relative;
-  z-index: 900;
-}
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    /* 라이트박스 내 이미지 컨테이너 및 이미지 (두 이미지 요소) */
+    #lightbox-container {
+      position: relative;
+      width: 90vw;
+      height: 80vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox-container img {
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+      will-change: transform, opacity;
+      max-width: 100%;
+      max-height: 100%;
+      position: absolute;
+      transform: translate3d(0,0,0);
+      opacity: 1;
+    }
     .close-btn {
-  position: fixed;
-  top: 20px;
-  right: 30px;
-  color: white;
-  font-size: 30px;
-  cursor: pointer;
-  z-index: 1100;
-}
+      position: fixed;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1100;
+    }
     .arrow {
       position: absolute;
       top: 50%;
@@ -126,7 +139,7 @@
     .dots .active {
       background-color: #717171;
     }
-      .nav-links {
+    .nav-links {
       list-style: none;
       display: flex;
       gap: 20px;
@@ -167,7 +180,7 @@
         font-size: 28px;
       }
     }
-</style>
+  </style>
 </head>
 <body>
   <header class="header">
@@ -208,7 +221,11 @@
 
   <div class="lightbox" id="lightbox">
     <span class="close-btn" onclick="closeLightbox()">&times;</span>
-    <img id="lightbox-img" src="" alt="Expanded image">
+    <!-- 두 이미지 요소를 포함하는 컨테이너 -->
+    <div id="lightbox-container">
+      <img id="lightbox-current" src="" alt="Expanded image">
+      <img id="lightbox-next" src="" alt="Expanded image" style="display: none;">
+    </div>
     <div class="arrow left" onclick="prevImage()">&#10094;</div>
     <div class="arrow right" onclick="nextImage()">&#10095;</div>
     <div class="dots" id="lightbox-dots"></div>
@@ -217,14 +234,25 @@
   <script>
     let galleryImages = [];
     let galleryIndex = 0;
+    let isAnimating = false;
 
     function openGallery(prefix) {
       galleryImages = [];
       for (let i = 1; i <= 5; i++) {
-        galleryImages.push(`https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i}).jpg`);
+        const src = `https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i}).jpg`;
+        galleryImages.push(src);
+        // 이미지 프리로딩
+        const preloadImg = new Image();
+        preloadImg.src = src;
       }
       galleryIndex = 0;
-      updateLightbox();
+      const currentImg = document.getElementById('lightbox-current');
+      currentImg.src = galleryImages[galleryIndex];
+      currentImg.style.transition = 'none';
+      currentImg.style.transform = 'translate3d(0,0,0)';
+      currentImg.style.opacity = '1';
+      document.getElementById('lightbox-next').style.display = 'none';
+      updateDots();
       document.getElementById('lightbox').style.display = 'flex';
     }
 
@@ -232,19 +260,55 @@
       document.getElementById('lightbox').style.display = 'none';
     }
 
+    // direction: 1 (다음), -1 (이전)
+    function slideImage(direction) {
+      if (isAnimating) return;
+      isAnimating = true;
+      const currentImg = document.getElementById('lightbox-current');
+      const nextImg = document.getElementById('lightbox-next');
+      const newIndex = (galleryIndex + direction + galleryImages.length) % galleryImages.length;
+      
+      // 다음 이미지 설정 및 초기 상태 (오프셋 및 투명)
+      nextImg.src = galleryImages[newIndex];
+      nextImg.style.display = 'block';
+      nextImg.style.transition = 'none';
+      nextImg.style.transform = `translate3d(${direction > 0 ? '100%' : '-100%'}, 0, 0)`;
+      nextImg.style.opacity = '0';
+      
+      // 강제로 재플로우 후 애니메이션 적용
+      requestAnimationFrame(() => {
+        currentImg.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+        nextImg.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+        
+        // 현재 이미지 슬라이드/페이드 아웃 & 다음 이미지 슬라이드/페이드 인
+        currentImg.style.transform = `translate3d(${direction > 0 ? '-100%' : '100%'}, 0, 0)`;
+        currentImg.style.opacity = '0';
+        nextImg.style.transform = 'translate3d(0,0,0)';
+        nextImg.style.opacity = '1';
+      });
+      
+      nextImg.addEventListener('transitionend', function handler(e) {
+        if(e.propertyName !== 'transform') return;
+        nextImg.removeEventListener('transitionend', handler);
+        galleryIndex = newIndex;
+        
+        // 새로운 상태를 current 이미지로 적용
+        currentImg.src = nextImg.src;
+        currentImg.style.transition = 'none';
+        currentImg.style.transform = 'translate3d(0,0,0)';
+        currentImg.style.opacity = '1';
+        nextImg.style.display = 'none';
+        isAnimating = false;
+        updateDots();
+      });
+    }
+
     function prevImage() {
-      galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
-      updateLightbox();
+      slideImage(-1);
     }
 
     function nextImage() {
-      galleryIndex = (galleryIndex + 1) % galleryImages.length;
-      updateLightbox();
-    }
-
-    function updateLightbox() {
-      document.getElementById('lightbox-img').src = galleryImages[galleryIndex];
-      updateDots();
+      slideImage(1);
     }
 
     function updateDots() {
@@ -256,13 +320,15 @@
         dotsContainer.appendChild(dot);
       });
     }
-  document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    closeLightbox();
-    closeContact();
-  }
-});
-</script>
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeContact();
+      }
+    });
+  </script>
+
   <div id="contact-popup" style="display:none; position:fixed; bottom:20px; left:20px; width:250px; background:#fff; border:1px solid #ccc; padding:15px; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:1000;">
     <span class="close-btn" onclick="closeContact()" style="position:absolute; top:10px; right:10px; background:#f0f0f0; color:#333; font-size:16px; font-weight:600; border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); cursor:pointer;">&times;</span>
     <h3 style="margin-bottom:10px;">문의하기</h3>
@@ -290,7 +356,6 @@
       const name = document.querySelector('#contact-popup input[placeholder="이름"]').value;
       const number = document.querySelector('#contact-popup input[placeholder="전화번호"]').value;
       const message = document.querySelector('#contact-popup textarea').value;
-
       const button = document.querySelector('#contact-popup button');
       button.innerText = '전송 중...';
       button.disabled = true;
@@ -316,12 +381,17 @@
       });
     }
   </script>
+
   <footer class="footer" style="display: flex; justify-content: center; align-items: center; position: relative; padding: 40px 20px; background: #f5f5f5; text-align: center;">
-  <div style="position: absolute; left: 20px;">
-    <a href="https://www.instagram.com/_eldkah/" target="_blank" style="background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; font-size: 1.5rem; margin-right: 10px;"><i class="fab fa-instagram"></i></a>
-    <a href="https://m.blog.naver.com/qowlans1211" target="_blank" style="color: #1EC800; font-weight: bold; font-size: 1.5rem;"><i class="fas fa-blog"></i></a>
-  </div>
-  <p style="margin: 0;">&copy; 2025 Diamo. All rights reserved.</p>
-</footer>
+    <div style="position: absolute; left: 20px;">
+      <a href="https://www.instagram.com/_eldkah/" target="_blank" style="background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; font-size: 1.5rem; margin-right: 10px;">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://m.blog.naver.com/qowlans1211" target="_blank" style="color: #1EC800; font-weight: bold; font-size: 1.5rem;">
+        <i class="fas fa-blog"></i>
+      </a>
+    </div>
+    <p style="margin: 0;">&copy; 2025 Diamo. All rights reserved.</p>
+  </footer>
 </body>
 </html>
