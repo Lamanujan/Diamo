@@ -3,96 +3,252 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Diamo Clone</title>
+  <title>DIAMO Gallery</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
   <style>
-    /* ─── 리셋 & 기본 ─────────────────────────────────────── */
+    /* ─── 리셋 & 기본 ───────────────────────────────── */
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Playfair Display', serif; background:#fff; color:#2a2a2a; line-height:1.8; }
-
-    /* ─── 헤더 & 네비게이션 ───────────────────────────────── */
-    .header { background:#f5f5f5; padding:20px; position:sticky; top:0; z-index:1000; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
-    .nav { display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:auto; }
-    .logo { font-size:2rem; font-weight:700; color:#111; }
-    .nav-links { list-style:none; display:flex; gap:20px; }
-    .nav-links a { text-decoration:none; color:#333; font-size:1.1rem; font-weight:500; }
-
-    /* ─── 히어로 ─────────────────────────────────────────── */
-    .hero { background:#e0e0e0; padding:100px 20px; text-align:center; }
-    .hero h1 { font-size:3rem; }
-    .hero p  { font-size:1.3rem; }
-
-    /* ─── 갤러리 그리드 ──────────────────────────────────── */
-    .section { padding:60px 20px; max-width:1000px; margin:auto; }
-    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:20px; }
-    .project { text-align:center; background:#f0f0f0; }
-    .project img {
-      width:100%; aspect-ratio:1/1; object-fit:cover;
-      cursor:pointer; transition:transform .3s ease;
+    body {
+      font-family: 'Playfair Display', serif;
+      background: #fff;
+      color: #2a2a2a;
+      overflow-x: hidden;
+      line-height: 1.6;
     }
-    .project img:hover { transform:scale(1.03); }
+    a { color: inherit; text-decoration: none; }
 
-    /* ─── 라이트박스 ─────────────────────────────────────── */
+    /* ─── 헤더 ──────────────────────────────────────── */
+    .header {
+      background: #f5f5f5;
+      padding: 16px;
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 1.1rem;
+      font-weight: 500;
+      padding: 6px 8px;
+      transition: background .2s;
+    }
+    .nav-links a:hover {
+      background: rgba(0,0,0,0.05);
+      border-radius: 4px;
+    }
+
+    /* ─── 히어로 ─────────────────────────────────────── */
+    .hero {
+      background: #e0e0e0;
+      text-align: center;
+      padding: 80px 16px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3rem);
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: clamp(1rem, 4vw, 1.2rem);
+    }
+
+    /* ─── 갤러리 ─────────────────────────────────────── */
+    .section {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 16px;
+    }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    .project {
+      background: #f0f0f0;
+      text-align: center;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .project img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      transition: transform .3s ease;
+    }
+    .project img:hover {
+      transform: scale(1.03);
+    }
+    .project-label {
+      padding: 8px 0;
+      font-weight: 500;
+    }
+
+    /* ─── 라이트박스 ─────────────────────────────────── */
     .lightbox {
-      display:none;              /* 기본 숨김 */
-      flex-direction:column;     /* 도트 아래 정렬 */
-      position:fixed; top:0; left:0;
-      width:100vw; height:100vh;
-      background:rgba(0,0,0,0.9);
-      justify-content:center; align-items:center;
-      z-index:2000;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 2000;
     }
     #lightbox-container {
-      position:relative; width:90vw; height:80vh;
-      overflow:hidden; display:flex; align-items:center; justify-content:center;
+      position: relative;
+      width: 90vw;
+      max-width: 800px;
+      height: 70vh;
+      max-height: 600px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
     }
-    #lightbox-container img {
-      position:absolute; max-width:100%; max-height:100%;
-      transition:transform .3s ease-out, opacity .3s ease-out;
-    }
-    .close-btn {
-      position:fixed; top:20px; right:30px;
-      font-size:30px; color:white; cursor:pointer; z-index:2100;
+    #lightbox-current, #lightbox-next {
+      position: absolute;
+      max-width: 100%;
+      max-height: 100%;
+      transition: transform .3s ease-out, opacity .3s ease-out;
     }
     .arrow {
-      position:absolute; top:50%; font-size:40px;
-      color:white; cursor:pointer; user-select:none;
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      font-size: 2.5rem;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
     }
-    .arrow.left  { left:20px; }
-    .arrow.right { right:20px; }
-    .dots { margin-top:12px; }  /* 이미지 아래 중앙 정렬 */
+    .arrow.left { left: 12px; }
+    .arrow.right { right: 12px; }
+    .close-btn {
+      position: fixed;
+      top: 16px; right: 16px;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+      z-index: 2100;
+    }
+    .dots {
+      margin-top: 12px;
+      display: flex;
+      gap: 6px;
+    }
     .dots span {
-      display:inline-block; width:10px; height:10px; margin:0 5px;
-      background:#bbb; border-radius:50%;
+      width: 10px;
+      height: 10px;
+      background: #777;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background .2s;
     }
-    .dots .active { background:#717171; }
+    .dots span.active {
+      background: #fff;
+    }
 
-    /* ─── 푸터 ───────────────────────────────────────────── */
+    /* ─── 문의 팝업 (왼쪽 하단) ───────────────────────── */
+    #contact-popup {
+      position: fixed;
+      bottom: 20px; left: 20px;
+      width: 280px;
+      max-width: 80%;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transform: translateX(-120%) translateY(120%);
+      opacity: 0;
+      transition: transform .4s ease, opacity .4s ease;
+      z-index: 1500;
+    }
+    #contact-popup.open {
+      transform: translateX(0) translateY(0);
+      opacity: 1;
+    }
+    #contact-popup .close-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      font-size: 1.2rem;
+      color: #333;
+      cursor: pointer;
+    }
+    #contact-popup h3 {
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+    }
+    #contact-popup input,
+    #contact-popup textarea {
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 6px;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+    }
+    #contact-popup button {
+      width: 100%;
+      padding: 10px;
+      background: #333;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* ─── 푸터 ───────────────────────────────────────── */
     .footer {
-      background:#f5f5f5; padding:40px 20px;
-      display:flex; flex-direction:column; align-items:center;
+      position: relative;
+      background: #f5f5f5;
+      padding: 24px 0;
+      margin-top: 40px;
+      text-align: center;
     }
-    .footer-copy { color:#666; font-size:0.9rem; }
+    .footer-copy {
+      font-size: .9rem;
+      color: #666;
+    }
     .footer-icons {
-      margin-top:10px; display:flex; gap:16px; font-size:1.5rem;
-      align-self:flex-start; margin-left:20px;  /* 왼쪽 정렬 */
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 12px;
+      font-size: 1.5rem;
+    }
+    .footer-icons a.instagram {
+      background: linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .footer-icons a.blog {
+      color: #1EC800;
     }
 
-    /* ─── 반응형(모바일) ───────────────────────────────── */
-    @media (max-width:768px) {
-      .nav {
-        flex-direction:row; justify-content:space-between; align-items:center;
-        padding:10px 20px;
+    /* ─── 모바일 전용 ───────────────────────────────── */
+    @media (max-width: 768px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
       }
-      .nav-links { flex-direction:row; margin-top:0; }
-      .close-btn { display:none !important; } /* 모바일에선 X 숨김 */
-      .hero { padding:60px 10px; }
-      .section { padding:40px 10px; }
+      /* 데스크탑용 X 버튼은 숨김 */
+      .close-btn { display: none; }
     }
   </style>
 </head>
 <body>
-
   <!-- 헤더 -->
   <header class="header">
     <nav class="nav">
@@ -113,25 +269,21 @@
   <section class="section">
     <h2>Gallery</h2>
     <div class="projects-grid">
-      <div class="project">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/w/hw.jpg"
-             alt="웨딩" onclick="openGallery('w')">
-        웨딩
+      <div class="project" data-prefix="w">
+        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/w/hw.jpg" alt="웨딩">
+        <div class="project-label">웨딩</div>
       </div>
-      <div class="project">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/b/hb.jpg"
-             alt="돌잔치" onclick="openGallery('b')">
-        돌잔치
+      <div class="project" data-prefix="b">
+        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/b/hb.jpg" alt="돌잔치">
+        <div class="project-label">돌잔치</div>
       </div>
-      <div class="project">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/s/hs.jpg"
-             alt="칠순팔순" onclick="openGallery('s')">
-        칠순팔순
+      <div class="project" data-prefix="s">
+        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/s/hs.jpg" alt="칠순팔순">
+        <div class="project-label">칠순팔순</div>
       </div>
-      <div class="project">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/m/hm.jpg"
-             alt="모임/세미나" onclick="openGallery('m')">
-        모임/세미나
+      <div class="project" data-prefix="m">
+        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/m/hm.jpg" alt="모임/세미나">
+        <div class="project-label">모임/세미나</div>
       </div>
     </div>
   </section>
@@ -142,196 +294,167 @@
     <div id="lightbox-container">
       <img id="lightbox-current" src="" alt=""/>
       <img id="lightbox-next"    src="" alt="" style="display:none;"/>
+      <div class="arrow left"  id="prevBtn">&#10094;</div>
+      <div class="arrow right" id="nextBtn">&#10095;</div>
     </div>
-    <div class="arrow left"  id="prevBtn">&#10094;</div>
-    <div class="arrow right" id="nextBtn">&#10095;</div>
     <div class="dots" id="lightbox-dots"></div>
   </div>
 
   <!-- 문의 팝업 -->
-  <div id="contact-popup"
-       style="display:none; position:fixed; bottom:20px; left:20px; width:90%; max-width:300px;
-              background:#fff; border:1px solid #ccc; padding:15px; box-shadow:0 0 10px rgba(0,0,0,0.2);
-              z-index:1500;">
-    <span class="close-btn"
-          onclick="closeContact()"
-          style="position:absolute; top:10px; right:10px; background:#f0f0f0; color:#333;
-                 font-size:16px; width:28px; height:28px; display:flex; align-items:center;
-                 justify-content:center; cursor:pointer;">
-      &times;
-    </span>
-    <h3 style="margin-bottom:10px;">문의하기</h3>
-    <input type="text" placeholder="이름" style="width:100%; margin-bottom:10px; padding:5px;">
-    <input type="text" placeholder="전화번호" style="width:100%; margin-bottom:10px; padding:5px;">
-    <textarea placeholder="메시지 내용" style="width:100%; margin-bottom:10px; padding:5px;"></textarea>
-    <button onclick="sendEmail()"
-            style="width:100%; padding:8px; background:#333; color:#fff; border:none; cursor:pointer;">
-      전송하기
-    </button>
+  <div id="contact-popup">
+    <span class="close-btn" onclick="closeContact()">&times;</span>
+    <h3>문의하기</h3>
+    <input type="text" placeholder="이름"/>
+    <input type="text" placeholder="전화번호"/>
+    <textarea placeholder="메시지를 입력하세요"></textarea>
+    <button onclick="sendEmail()">전송하기</button>
   </div>
 
   <!-- 푸터 -->
   <footer class="footer">
-    <p class="footer-copy">© 2025 DIAMO. All rights reserved.</p>
     <div class="footer-icons">
-      <a href="https://www.instagram.com/_eldkah/" target="_blank"
-         style="background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);
-                -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+      <a href="https://www.instagram.com/_eldkah/" target="_blank" class="instagram">
         <i class="fab fa-instagram"></i>
       </a>
-      <a href="https://m.blog.naver.com/qowlans1211" target="_blank" style="color:#1EC800;">
+      <a href="https://m.blog.naver.com/qowlans1211" target="_blank" class="blog">
         <i class="fas fa-blog"></i>
       </a>
     </div>
+    <div class="footer-copy">© 2025 DIAMO. All rights reserved.</div>
   </footer>
 
-  <!-- 스크립트 -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
-    emailjs.init("9YqLj0sQHeKA9XkIJ");
+    emailjs.init("YOUR_EMAILJS_USER_ID");
 
     let galleryImages = [], galleryIndex = 0, isAnimating = false;
-    const counts = { w:29, b:8, s:59, m:47 }, visibleDots = 5;
+    const counts = { w:29, b:8, s:59, m:47 };
+    const VISIBLE_DOTS = 5;
 
-    // 갤러리 오픈
+    // 프로젝트 클릭 → 라이트박스 오픈
+    document.querySelectorAll('.project').forEach(el => {
+      el.addEventListener('click', () => openGallery(el.dataset.prefix));
+    });
+
     function openGallery(prefix) {
-      galleryImages = [];
-      for (let i = 1; i <= counts[prefix]; i++) {
-        galleryImages.push(`https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i}).jpg`);
-      }
+      const total = counts[prefix];
+      galleryImages = Array.from({length: total}, (_, i) =>
+        `https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i+1}).jpg`
+      );
       galleryIndex = 0;
       showImage(0);
       document.getElementById('lightbox').style.display = 'flex';
-      history.pushState({ lightboxOpen:true }, '', '');
+      history.pushState({lightboxOpen:true}, '', '');
     }
 
-    // 갤러리 닫기
     function closeLightbox() {
       document.getElementById('lightbox').style.display = 'none';
       if (history.state?.lightboxOpen) history.back();
     }
-
-    // 뒤로가기 버튼으로 닫기
+    document.getElementById('closeBtn').onclick = closeLightbox;
     window.addEventListener('popstate', () => {
       if (document.getElementById('lightbox').style.display === 'flex') {
-        document.getElementById('lightbox').style.display = 'none';
+        closeLightbox();
       }
     });
 
-    // 이미지 표시 & 도트 업데이트
     function showImage(idx) {
-      document.getElementById('lightbox-current').src = galleryImages[idx];
+      const curr = document.getElementById('lightbox-current');
+      curr.src = galleryImages[idx];
       galleryIndex = idx;
       updateDots();
     }
 
-    // 슬라이드 애니메이션
-    function slideImage(dir) {
+    function slide(dir) {
       if (isAnimating) return;
       isAnimating = true;
       const curr = document.getElementById('lightbox-current');
-      const next = document.getElementById('lightbox-next');
+      const nxt  = document.getElementById('lightbox-next');
       const newIdx = (galleryIndex + dir + galleryImages.length) % galleryImages.length;
 
-      next.src = galleryImages[newIdx];
-      next.style.display = 'block';
-      next.style.transition = 'none';
-      next.style.transform = `translate3d(${dir>0?'100%':'-100%'},0,0)`;
-      next.style.opacity = '0';
+      nxt.src = galleryImages[newIdx];
+      nxt.style.display = 'block';
+      nxt.style.transition = 'none';
+      nxt.style.transform = `translateX(${dir>0?100:-100}%)`;
+      nxt.style.opacity = '0';
 
       requestAnimationFrame(() => {
         curr.style.transition = 'transform .3s ease-out, opacity .3s ease-out';
-        next.style.transition = 'transform .3s ease-out, opacity .3s ease-out';
-        curr.style.transform = `translate3d(${dir>0?'-100%':'100%'},0,0)`;
-        curr.style.opacity = '0';
-        next.style.transform = 'translate3d(0,0,0)';
-        next.style.opacity = '1';
+        nxt.style.transition  = 'transform .3s ease-out, opacity .3s ease-out';
+        curr.style.transform  = `translateX(${dir>0?-100:100}%)`;
+        curr.style.opacity    = '0';
+        nxt.style.transform   = 'translateX(0)';
+        nxt.style.opacity     = '1';
       });
 
-      next.addEventListener('transitionend', function handler(e) {
+      nxt.addEventListener('transitionend', function handler(e) {
         if (e.propertyName !== 'transform') return;
-        next.removeEventListener('transitionend', handler);
-        curr.src = next.src;
+        nxt.removeEventListener('transitionend', handler);
+        curr.src = nxt.src;
         curr.style.transition = 'none';
-        curr.style.transform = 'translate3d(0,0,0)';
-        curr.style.opacity = '1';
-        next.style.display = 'none';
+        curr.style.transform  = 'none';
+        curr.style.opacity    = '1';
+        nxt.style.display      = 'none';
         galleryIndex = newIdx;
         updateDots();
         isAnimating = false;
       });
     }
+    document.getElementById('prevBtn').onclick = () => slide(-1);
+    document.getElementById('nextBtn').onclick = () => slide(1);
 
-    // 버튼 이벤트
-    document.getElementById('prevBtn').addEventListener('click', () => slideImage(-1));
-    document.getElementById('nextBtn').addEventListener('click', () => slideImage(1));
-    document.getElementById('closeBtn').addEventListener('click', closeLightbox);
+    function updateDots() {
+      const wrap = document.getElementById('lightbox-dots');
+      wrap.innerHTML = '';
+      const total = galleryImages.length;
+      const half = Math.floor(VISIBLE_DOTS / 2);
+      let start = galleryIndex - half;
+      if (start < 0) start = 0;
+      if (start + VISIBLE_DOTS > total) start = Math.max(total - VISIBLE_DOTS, 0);
+
+      for (let i = 0; i < VISIBLE_DOTS; i++) {
+        const idx = start + i;
+        const dot = document.createElement('span');
+        if (idx === galleryIndex) dot.classList.add('active');
+        dot.addEventListener('click', () => showImage(idx));
+        wrap.appendChild(dot);
+      }
+    }
 
     // 터치 스와이프
     (function(){
       const box = document.getElementById('lightbox-container');
       let startX=0, startT=0;
-      box.addEventListener('touchstart', e=> { startX=e.touches[0].clientX; startT=Date.now(); });
-      box.addEventListener('touchend',   e=> {
+      box.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX; startT = Date.now();
+      });
+      box.addEventListener('touchend', e => {
         const dx = e.changedTouches[0].clientX - startX;
         const dt = Date.now() - startT;
-        if (Math.abs(dx)>50 && dt<500) slideImage(dx<0?1:-1);
+        if (Math.abs(dx) > 50 && dt < 500) slide(dx < 0 ? 1 : -1);
       });
     })();
 
-    // 도트 업데이트
-    function updateDots() {
-      const wrap = document.getElementById('lightbox-dots');
-      wrap.innerHTML = '';
-      const total = Math.min(visibleDots, galleryImages.length);
-      const start = Math.max(0, Math.min(galleryIndex - Math.floor(visibleDots/2), galleryImages.length - visibleDots));
-      for (let i=0; i<total; i++) {
-        const dot = document.createElement('span');
-        if (i === (galleryIndex - start)) dot.classList.add('active');
-        wrap.appendChild(dot);
+    // ESC 키 닫기
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('lightbox').style.display === 'flex') closeLightbox();
+        if (document.getElementById('contact-popup').classList.contains('open')) closeContact();
       }
-    }
+    });
 
     // 문의 팝업
-    document.getElementById('contact-link').addEventListener('click', e => {
+    document.getElementById('contact-link').onclick = function(e) {
       e.preventDefault();
-      const pu = document.getElementById('contact-popup');
-      pu.style.display = pu.style.display==='none'?'block':'none';
-    });
+      document.getElementById('contact-popup').classList.toggle('open');
+    };
     function closeContact() {
-      document.getElementById('contact-popup').style.display='none';
+      document.getElementById('contact-popup').classList.remove('open');
     }
-
-    // 이메일 전송
     function sendEmail() {
-      const name = document.querySelector('#contact-popup input[placeholder="이름"]').value;
-      const num  = document.querySelector('#contact-popup input[placeholder="전화번호"]').value;
-      const msg  = document.querySelector('#contact-popup textarea').value;
-      const btn  = document.querySelector('#contact-popup button');
-      btn.innerText='전송 중...'; btn.disabled=true; btn.style.opacity='0.6';
-      emailjs.send("service_12ehn7t","template_2jcmp9n",{
-        from_name:name, contact_number:num, message:msg
-      }).then(_=>{
-        btn.innerText='전송 완료';
-        setTimeout(()=>{
-          btn.innerText='전송하기'; btn.disabled=false; btn.style.opacity='1';
-        },2000);
-      }, _=>{
-        alert("전송 실패"); btn.innerText='전송하기'; btn.disabled=false; btn.style.opacity='1';
-      });
+      // EmailJS 로직 삽입
+      alert('전송 로직을 여기에 구현하세요');
     }
-
-    // ESC 키로 닫기 (라이트박스 + 문의팝업)
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        if (document.getElementById('lightbox').style.display === 'flex') {
-          closeLightbox();
-        }
-        if (document.getElementById('contact-popup').style.display === 'block') {
-          closeContact();
-        }
-      }
-    });
   </script>
 </body>
 </html>
