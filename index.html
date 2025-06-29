@@ -9,162 +9,83 @@
   <style>
     /* ─── 리셋 & 기본 ───────────────────────────────── */
     * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family:'Playfair Display', serif;
-      background:#fff; color:#2a2a2a;
-      overflow-x:hidden; line-height:1.6;
-    }
+    body { font-family:'Playfair Display', serif; background:#fff; color:#2a2a2a; overflow-x:hidden; line-height:1.6; }
     a { color:inherit; text-decoration:none; }
 
     /* ─── 헤더 ───────────────────────────────────────── */
-    .header {
-      background:#f5f5f5; padding:16px;
-      position:sticky; top:0; z-index:1000;
-      box-shadow:0 2px 4px rgba(0,0,0,0.05);
-    }
-    .nav {
-      max-width:1200px; margin:0 auto;
-      display:flex; justify-content:space-between; align-items:center;
-    }
+    .header { background:#f5f5f5; padding:16px; position:sticky; top:0; z-index:1000; }
+    .nav { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
     .logo { font-size:1.8rem; font-weight:700; }
-    .nav-links {
-      display:flex; gap:20px; list-style:none;
-    }
-    .nav-links a {
-      font-size:1.1rem; font-weight:500;
-      padding:6px 8px; transition:background .2s;
-    }
-    .nav-links a:hover {
-      background:rgba(0,0,0,0.05); border-radius:4px;
-    }
-    /* “문의하기” 링크 차분한 컬러 유지 */
-    .nav-links a#contact-link {
-      color:#555;
-    }
+    .nav-links { display:flex; gap:20px; list-style:none; }
+    .nav-links a { padding:6px 8px; font-size:1.1rem; transition:background .2s; }
+    .nav-links a:hover { background:rgba(0,0,0,0.05); border-radius:4px; }
+    .nav-links a#contact-link { color:#555; }
 
     /* ─── 히어로 ─────────────────────────────────────── */
-    .hero {
-      background:#e0e0e0; text-align:center;
-      padding:80px 16px;
-    }
-    .hero h1 {
-      font-size:clamp(2rem,6vw,3rem);
-      margin-bottom:12px;
-    }
-    .hero p {
-      font-size:clamp(1rem,4vw,1.2rem);
-    }
+    .hero { background:#e0e0e0; text-align:center; padding:80px 16px; }
+    .hero h1 { font-size:clamp(2rem,6vw,3rem); margin-bottom:12px; }
+    .hero p  { font-size:clamp(1rem,4vw,1.2rem); }
 
     /* ─── 갤러리 ─────────────────────────────────────── */
-    .section {
-      max-width:1000px; margin:0 auto;
-      padding:40px 16px;
-    }
-    .projects-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-      gap:16px;
-    }
-    .project {
-      background:#f0f0f0; text-align:center;
-      cursor:pointer; overflow:hidden;
-    }
-    .project img {
-      width:100%; height:auto; object-fit:cover;
-      transition:transform .3s ease;
-    }
-    .project img:hover {
-      transform:scale(1.03);
-    }
-    .project-label {
-      padding:8px 0; font-weight:500;
-    }
+    .section { max-width:1000px; margin:0 auto; padding:40px 16px; }
+    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+    .project { background:#f0f0f0; text-align:center; cursor:pointer; overflow:hidden; }
+    .project img { width:100%; object-fit:cover; transition:transform .3s; }
+    .project img:hover { transform:scale(1.03); }
+    .project-label { padding:8px 0; font-weight:500; }
 
     /* ─── 라이트박스 ─────────────────────────────────── */
-    .lightbox {
-      display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,0.9);
-      justify-content:center; align-items:center;
-      flex-direction:column; z-index:2000;
-    }
+    .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; flex-direction:column; z-index:2000; }
     #lightbox-container {
-      position:relative;
-      width:90vw; max-width:800px;
-      height:70vh; max-height:600px;
-      display:flex; justify-content:center; align-items:center;
-      overflow:hidden;
+      position:relative; width:90vw; max-width:800px; height:70vh; max-height:600px;
+      display:flex; justify-content:center; align-items:center; overflow:hidden; touch-action:pan-y;
     }
     #lightbox-current, #lightbox-next {
-      position:absolute;
-      max-width:100%; max-height:100%;
+      position:absolute; max-width:100%; max-height:100%;
       transition:transform .3s ease-out, opacity .3s ease-out;
     }
     .arrow {
       position:absolute; top:50%; transform:translateY(-50%);
-      font-size:2.5rem; color:#fff;
-      cursor:pointer; user-select:none;
+      font-size:2.5rem; color:#fff; cursor:pointer;
     }
     .arrow.left  { left:12px; }
     .arrow.right { right:12px; }
     .close-btn {
       position:fixed; top:16px; right:16px;
-      font-size:2rem; color:#fff; cursor:pointer;
-      z-index:2100;
+      font-size:2rem; color:#fff; cursor:pointer; z-index:2100;
     }
-    .dots {
-      margin-top:12px; display:flex; gap:6px;
-    }
+    .dots { margin-top:12px; display:flex; gap:6px; }
     .dots span {
-      width:10px; height:10px;
-      background:#777; border-radius:50%;
+      width:10px; height:10px; background:#777; border-radius:50%;
       cursor:pointer; transition:background .2s;
     }
     .dots span.active { background:#fff; }
 
-    /* ─── 문의 팝업 (왼쪽 하단) ───────────────────────── */
+    /* ─── 문의 팝업 ─────────────────────────────────── */
     #contact-popup {
       position:fixed; bottom:20px; left:20px;
-      width:280px; max-width:80%;
-      background:#fff;
-      border:1px solid rgba(0,0,0,0.1);
-      padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.2);
-      transform:translateX(-120%) translateY(120%);
-      opacity:0; transition:transform .4s ease, opacity .4s ease;
-      z-index:1500;
+      width:280px; max-width:80%; background:#fff;
+      border:1px solid rgba(0,0,0,0.1); padding:16px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);
+      transform:translateX(-120%) translateY(120%); opacity:0;
+      transition:transform .4s ease, opacity .4s ease; z-index:1500;
     }
-    #contact-popup.open {
-      transform:translateX(0) translateY(0);
-      opacity:1;
-    }
+    #contact-popup.open { transform:translateX(0) translateY(0); opacity:1; }
     #contact-popup .close-btn {
-      position:absolute; top:8px; right:8px;
-      font-size:1.2rem; color:#333; cursor:pointer;
+      position:absolute; top:8px; right:8px; font-size:1.2rem; color:#333; cursor:pointer;
     }
-    #contact-popup h3 {
-      margin-bottom:8px; font-size:1.2rem;
-    }
-    #contact-popup input,
-    #contact-popup textarea {
-      width:100%; margin-bottom:8px; padding:6px;
-      font-size:1rem; border:1px solid #ddd;
+    #contact-popup h3 { margin-bottom:8px; font-size:1.2rem; }
+    #contact-popup input, #contact-popup textarea {
+      width:100%; margin-bottom:8px; padding:6px; border:1px solid #ddd; font-size:1rem;
     }
     #contact-popup button {
-      width:100%; padding:10px;
-      background:#555; color:#fff; border:none;
-      cursor:pointer; font-size:1rem;
+      width:100%; padding:10px; background:#555; color:#fff; border:none; cursor:pointer; font-size:1rem;
     }
-    #contact-popup button:hover {
-      background:#777;
-    }
+    #contact-popup button:hover { background:#777; }
 
     /* ─── 푸터 ───────────────────────────────────────── */
-    .footer {
-      position:relative; background:#f5f5f5;
-      padding:24px 0; margin-top:40px; text-align:center;
-    }
-    .footer-copy {
-      font-size:.9rem; color:#666;
-    }
+    .footer { position:relative; background:#f5f5f5; padding:24px 0; margin-top:40px; text-align:center; }
+    .footer-copy { font-size:.9rem; color:#666; }
     .footer-icons {
       position:fixed; left:20px; bottom:24px;
       display:flex; gap:12px; font-size:1.5rem;
@@ -175,15 +96,11 @@
     }
     .footer-icons a.blog { color:#1EC800; }
 
-    /* ─── 모바일 전용 ───────────────────────────────── */
     @media (max-width:768px) {
-      .projects-grid {
-        grid-template-columns:1fr;
-      }
+      .projects-grid { grid-template-columns:1fr; }
       .close-btn { display:none; }
       .footer-icons {
-        position:static; transform:none;
-        margin:8px 0 0 20px;
+        position:static; margin:8px 0 0 20px; transform:none;
       }
     }
   </style>
@@ -264,6 +181,7 @@
     <div class="footer-copy">© 2025 DIAMO. All rights reserved.</div>
   </footer>
 
+  <!-- 스크립트는 바디 맨 끝에, DOM 요소 로드 후 실행 -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
     emailjs.init("YOUR_EMAILJS_USER_ID");
@@ -271,31 +189,21 @@
     let galleryImages = [], galleryIndex = 0, isAnimating = false;
     const counts = { w:29, b:8, s:59, m:47 }, VISIBLE_DOTS = 5;
 
-    // 갤러리 오픈
-    document.querySelectorAll('.project img').forEach(img => {
-      img.addEventListener('click', () => {
-        const prefix = img.closest('.project').dataset.prefix;
-        openGallery(prefix);
-      });
-    });
-    function openGallery(prefix) {
-      const total = counts[prefix];
-      galleryImages = Array.from({length: total}, (_,i) =>
-        `https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i+1}).jpg`
-      );
-      galleryIndex = 0;
-      showImage(0);
-      document.getElementById('lightbox').style.display = 'flex';
-      history.pushState({lightboxOpen:true}, '', '');
+    function updateDots() {
+      const wrap = document.getElementById('lightbox-dots');
+      wrap.innerHTML = '';
+      const total = galleryImages.length, half = Math.floor(VISIBLE_DOTS / 2);
+      let start = galleryIndex - half;
+      if (start < 0) start = 0;
+      if (start + VISIBLE_DOTS > total) start = Math.max(total - VISIBLE_DOTS, 0);
+      for (let i = 0; i < VISIBLE_DOTS; i++) {
+        const idx = start + i;
+        const dot = document.createElement('span');
+        if (idx === galleryIndex) dot.classList.add('active');
+        dot.onclick = () => showImage(idx);
+        wrap.appendChild(dot);
+      }
     }
-    function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
-      if (history.state?.lightboxOpen) history.back();
-    }
-    document.getElementById('closeBtn').onclick = closeLightbox;
-    window.addEventListener('popstate', () => {
-      if (document.getElementById('lightbox').style.display === 'flex') closeLightbox();
-    });
 
     function showImage(idx) {
       document.getElementById('lightbox-current').src = galleryImages[idx];
@@ -309,46 +217,74 @@
       const curr = document.getElementById('lightbox-current');
       const nxt  = document.getElementById('lightbox-next');
       const newIdx = (galleryIndex + dir + galleryImages.length) % galleryImages.length;
+
       nxt.src = galleryImages[newIdx];
-      nxt.style.display = 'block'; nxt.style.transition = 'none';
-      nxt.style.transform = `translateX(${dir>0?100:-100}%)`; nxt.style.opacity = '0';
+      nxt.style.display    = 'block';
+      nxt.style.transition = 'none';
+      nxt.style.transform  = `translateX(${dir>0?100:-100}%)`;
+      nxt.style.opacity    = '0';
+
       requestAnimationFrame(() => {
         curr.style.transition = 'transform .3s ease-out, opacity .3s ease-out';
         nxt.style.transition  = 'transform .3s ease-out, opacity .3s ease-out';
-        curr.style.transform  = `translateX(${dir>0?-100:100}%)`; curr.style.opacity = '0';
-        nxt.style.transform   = 'translateX(0)'; nxt.style.opacity = '1';
-      });  
-
-      nxt.addEventListener('transitionend', function handler(e) {
-        if (e.propertyName !== 'transform') return;
-        nxt.removeEventListener('transitionend', handler);
-        curr.src = nxt.src;
-        curr.style.transition = 'none'; curr.style.transform = 'none'; curr.style.opacity = '1';
-        nxt.style.display = 'none';
-        galleryIndex = newIdx; updateDots(); isAnimating = false;
+        curr.style.transform  = `translateX(${dir>0?-100:100}%)`;
+        curr.style.opacity    = '0';
+        nxt.style.transform   = 'translateX(0)';
+        nxt.style.opacity     = '1';
       });
+
+      nxt.ontransitionend = e => {
+        if (e.propertyName !== 'transform') return;
+        nxt.ontransitionend = null;
+        curr.src = nxt.src;
+        curr.style.transition = 'none';
+        curr.style.transform  = 'none';
+        curr.style.opacity    = '1';
+        nxt.style.display      = 'none';
+        galleryIndex = newIdx;
+        updateDots();
+        isAnimating = false;
+      };
     }
+
+    function openGallery(prefix) {
+      const total = counts[prefix];
+      galleryImages = Array.from({length: total}, (_, i) =>
+        `https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i+1}).jpg`
+      );
+      galleryIndex = 0;
+
+      // 완전 초기화
+      const curr = document.getElementById('lightbox-current');
+      const nxt  = document.getElementById('lightbox-next');
+      curr.style.transition = nxt.style.transition = 'none';
+      curr.style.transform  = nxt.style.transform  = 'none';
+      curr.style.opacity    = '1'; nxt.style.opacity = '0';
+      nxt.style.display      = 'none';
+
+      showImage(0);
+      document.getElementById('lightbox').style.display = 'flex';
+      history.pushState({lightboxOpen:true}, '', '');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+      if (history.state?.lightboxOpen) history.back();
+    }
+
+    // 바인딩
+    document.querySelectorAll('.project').forEach(el => {
+      el.onclick = () => openGallery(el.dataset.prefix);
+    });
     document.getElementById('prevBtn').onclick = () => slide(-1);
     document.getElementById('nextBtn').onclick = () => slide(1);
-
-    function updateDots() {
-      const wrap = document.getElementById('lightbox-dots');
-      wrap.innerHTML = '';
-      const total = galleryImages.length, half = Math.floor(VISIBLE_DOTS/2);
-      let start = galleryIndex - half;
-      if (start < 0) start = 0;
-      if (start + VISIBLE_DOTS > total) start = Math.max(total - VISIBLE_DOTS, 0);
-      for (let i=0; i<VISIBLE_DOTS; i++) {
-        const idx = start + i;
-        const dot = document.createElement('span');
-        if (idx === galleryIndex) dot.classList.add('active');
-        dot.onclick = () => showImage(idx);
-        wrap.appendChild(dot);
-      }
-    }
+    document.getElementById('closeBtn').onclick = closeLightbox;
+    window.onpopstate = () => {
+      if (document.getElementById('lightbox').style.display === 'flex') closeLightbox();
+    };
 
     // 터치 스와이프
-    ;(function(){
+    (function(){
       const box = document.getElementById('lightbox-container');
       let sx=0, st=0;
       box.addEventListener('touchstart', e=>{
@@ -357,20 +293,20 @@
       box.addEventListener('touchend', e=>{
         const dx = e.changedTouches[0].clientX - sx;
         const dt = Date.now() - st;
-        if (Math.abs(dx)>50 && dt<500) slide(dx<0?1:-1);
+        if (Math.abs(dx) > 50 && dt < 500) slide(dx<0?1:-1);
       });
     })();
 
     // ESC 키 닫기
     document.addEventListener('keydown', e=>{
       if (e.key==='Escape') {
-        if (document.getElementById('lightbox').style.display==='flex') closeLightbox();
-        if (document.getElementById('contact-popup').classList.contains('open')) closeContact();
+        closeLightbox();
+        document.getElementById('contact-popup').classList.remove('open');
       }
     });
 
-    // 문의 팝업 토글
-    document.getElementById('contact-link').onclick = function(e){
+    // 문의 팝업
+    document.getElementById('contact-link').onclick = e=>{
       e.preventDefault();
       document.getElementById('contact-popup').classList.toggle('open');
     };
@@ -378,7 +314,7 @@
       document.getElementById('contact-popup').classList.remove('open');
     }
     function sendEmail() {
-      alert('전송 로직을 여기에 구현하세요');
+      alert('전송 로직을 구현하세요');
     }
   </script>
 </body>
