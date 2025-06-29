@@ -41,9 +41,9 @@
     .project { background: #f0f0f0; text-align: center; cursor: pointer; overflow: hidden; }
     .project img {
       width: 100%; object-fit: cover; transition: transform var(--transition-fast) ease;
+      loading: lazy;
     }
     .project img:hover { transform: scale(1.03); }
-    .project img { loading: lazy; }
     .project-label { padding: 8px 0; font-weight: 500; }
 
     /* Lightbox */
@@ -178,11 +178,10 @@
       emailjs.init("YOUR_EMAILJS_USER_ID");
 
       let galleryImages = [], galleryIndex = 0, isAnimating = false;
-      const counts = { w:29, b:22, s:59, m:47 }, VISIBLE_DOTS = 5;
+      const counts = { w:29, b:8, s:59, m:47 }, VISIBLE_DOTS = 5;
 
       function updateDots() {
-        const wrap = document.getElementById('lightbox-dots');
-        wrap.innerHTML = '';
+        const wrap = document.getElementById('lightbox-dots'); wrap.innerHTML = '';
         const total = galleryImages.length;
         const half  = Math.floor(VISIBLE_DOTS/2);
         let start   = galleryIndex - half;
@@ -192,11 +191,7 @@
       }
 
       function showImage(idx) {
-        const curr = document.getElementById('lightbox-current');
-        curr.src = galleryImages[idx];
-        galleryIndex = idx;
-        updateDots();
-      }
+        const curr = document.getElementById('lightbox-current'); curr.src = galleryImages[idx]; galleryIndex = idx; updateDots(); }
 
       function slide(dir) {
         if (isAnimating) return; isAnimating=true;
@@ -211,11 +206,20 @@
       }
 
       function openGallery(prefix) {
-        const total=counts[prefix];
-        galleryImages=Array.from({length:total},(_,i)=>`https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i+1}).jpg`);
-        galleryIndex=0;
-        const curr=document.getElementById('lightbox-current'), nxt=document.getElementById('lightbox-next');
+        const total=counts[prefix]; galleryImages=Array.from({length:total},(_,i)=>`https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i+1}).jpg`);
+        galleryIndex=0; const curr=document.getElementById('lightbox-current'), nxt=document.getElementById('lightbox-next');
         [curr,nxt].forEach(el=>{el.style.transition='none'; el.style.transform='none'; el.style.opacity=el===curr?'1':'0'; el.src='';}); nxt.style.display='none'; showImage(0);
+        const lb=document.getElementById('lightbox-container');
+        let startX=0, endX=0;
+        lb.addEventListener('touchstart', e=> startX=e.touches[0].clientX);
+        lb.addEventListener('touchmove', e=> endX=e.touches[0].clientX);
+                lb.addEventListener('touchend', e=> {
+          const diff = endX - startX;
+          const threshold = lb.clientWidth * 0.2; // 인스타그램 수준의 민감도 (화면 너비의 20%)
+          if (Math.abs(diff) > threshold) {
+            diff > 0 ? slide(-1) : slide(1);
+          }
+        });
         document.getElementById('lightbox').style.display='flex'; history.pushState({lightboxOpen:true},'', '');
       }
 
