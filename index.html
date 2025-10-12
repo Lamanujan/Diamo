@@ -2,117 +2,103 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DIAMO Gallery</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    :root {
-      --bg-light: #f5f5f5;
-      --bg-dark: rgba(0,0,0,0.9);
-      --text-main: #2a2a2a;
-      --text-light: #fff;
-      --primary: #555;
-      --transition-fast: .3s;
+    :root{
+      --bg-light:#f5f5f5;
+      --text:#222;
+      --text-inv:#fff;
+      --primary:#555;
+      --radius:18px;
+      --speed:.28s;
+      --container: min(2000px, 94vw);
+      --gap: clamp(8px, 2vw, 24px);
+      --card-min: clamp(120px, 28vw, 380px);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Playfair Display', serif; background: var(--text-light); color: var(--text-main); overflow-x: hidden; line-height: 1.6; }
-    a { color: inherit; text-decoration: none; }
-
-    /* Header */
-    .header { background: var(--bg-light); padding: 16px; position: sticky; top: 0; z-index: 1000; }
-    .nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 1.8rem; font-weight: 700; }
-    .nav-links { display: flex; gap: 20px; list-style: none; }
-    .nav-links a { padding: 6px 8px; font-size: 1.1rem; transition: background var(--transition-fast); }
-    .nav-links a:hover { background: rgba(0,0,0,0.05); border-radius: 4px; }
-
-    /* Hero */
-    .hero { background: #e0e0e0; text-align: center; padding: 80px 16px; }
-    .hero h1 { font-size: clamp(2rem,6vw,3rem); margin-bottom: 12px; }
-    .hero p  { font-size: clamp(1rem,4vw,1.2rem); }
-
-    /* Gallery */
-    .section { max-width: 1000px; margin: 0 auto; padding: 40px 16px; }
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
-      gap: 16px;
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family:'Playfair Display',serif;
+      color:var(--text); background:#fff; line-height:1.6; overflow-x:hidden;
+      text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
-    .project { background: #f0f0f0; text-align: center; cursor: pointer; overflow: hidden; }
-    .project img {
-      width: 100%; object-fit: cover; transition: transform var(--transition-fast) ease;
-      loading: lazy;
+    a{color:inherit;text-decoration:none}
+    .header{position:sticky;top:0;z-index:1000;background:var(--bg-light);backdrop-filter:saturate(150%) blur(6px)}
+    .nav{width:var(--container);margin-inline:auto;display:flex;align-items:center;justify-content:space-between;padding:10px 2px}
+    .logo{font-size:clamp(1.15rem, 2.6vw, 2rem);font-weight:700;letter-spacing:.02em}
+    .nav-links{list-style:none;display:flex;gap:14px}
+    .nav-links a{padding:6px 10px;border-radius:8px;transition:background var(--speed)}
+    .nav-links a:hover{background:rgba(0,0,0,.06)}
+    .hero{background:#e9e9e9;text-align:center;padding:clamp(36px,8vw,120px) 16px}
+    .hero h1{font-size:clamp(1.4rem, 5vw, 3.4rem);margin-bottom:8px}
+    .hero p{font-size:clamp(.9rem, 2.2vw, 1.3rem);opacity:.85}
+    .section{width:var(--container);margin-inline:auto;padding:clamp(18px,5vw,48px) 2px}
+    .section h2{font-size:clamp(1.1rem,3vw,2rem);margin-bottom:12px}
+    .projects-grid{display:grid;grid-template-columns: repeat(auto-fit, minmax(var(--card-min), 1fr));gap:var(--gap)}
+    .project{background:transparent;border:none;border-radius:var(--radius);overflow:hidden;cursor:pointer;outline:none;box-shadow:none;transition:transform var(--speed)}
+    .project:focus-visible{outline: 2px solid rgba(0,0,0,.22);outline-offset: 4px;border-radius: 14px}
+    .thumb{width:100%;aspect-ratio: 4/3;object-fit:cover;display:block;transition:transform var(--speed) ease, filter var(--speed) ease, opacity .48s ease}
+    .project-label{padding:10px 12px;font-weight:600;text-align:center;transition: transform .28s ease, opacity .28s ease;opacity:.95}
+    .project:hover .thumb{transform: scale(1.04);filter: drop-shadow(0 8px 22px rgba(0,0,0,.18))}
+    .project:hover .project-label{transform: translateY(-2px);opacity:1}
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background: radial-gradient(1200px 800px at 50% 50%, rgba(0,0,0,.88), rgba(0,0,0,.96));z-index:2000}
+    .lightbox[aria-hidden="false"]{display:flex}
+    .close-btn{position:fixed;top:12px;right:14px;z-index:2100;font-size:clamp(1.3rem, 3vw, 2.2rem);color:var(--text-inv);background:transparent;border:0;cursor:pointer;line-height:1}
+    #lightbox-container{position:relative;width: clamp(280px, 96vw, 2200px);height: clamp(45vh, 88dvh, 1200px);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius: clamp(8px, 1.2vw, 20px);box-shadow: 0 10px 40px rgba(0,0,0,.35);outline:none}
+    #lightbox-current,#lightbox-next{position:absolute;inset:auto;max-width:100%;max-height:100%;object-fit:contain;will-change:transform,opacity}
+    .arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2050;background:rgba(0,0,0,.35);border:0;color:var(--text-inv);font-size:clamp(1.3rem, 3.8vw, 2.6rem);width:clamp(36px, 6vw, 60px);height:clamp(36px, 6vw, 60px);border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:background var(--speed)}
+    .arrow:hover{background:rgba(0,0,0,.5)}
+    .arrow.left{left:10px}
+    .arrow.right{right:10px}
+    .dots{margin-top:10px;display:flex;gap:6px;overflow:auto;padding:4px 10px;max-width:var(--container)}
+    .dots::-webkit-scrollbar{height:6px}
+    .dots span{min-width:10px;height:10px;background:#888;border-radius:50%;cursor:pointer;transition:background var(--speed),transform var(--speed)}
+    .dots span.active{background:#fff;transform:scale(1.15)}
+    #contact-popup{position:fixed;bottom:20px;left:20px;z-index:1500;width:min(340px, 90vw);background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);transform: translate(-120%, 120%);opacity:0;transition: transform .38s ease, opacity .38s ease}
+    #contact-popup.open{transform:none;opacity:1}
+    #contact-popup .close-btn{position:absolute;top:8px;right:10px;color:#333}
+    #contact-popup input,#contact-popup textarea{width:100%;margin-bottom:8px;padding:10px;border-radius:10px;border:1px solid #e6e6e6;font-size:1rem}
+    #contact-popup button{width:100%;padding:10px 12px;border:0;color:#fff;background:var(--primary);border-radius:10px;cursor:pointer}
+    #contact-popup button:hover{filter:brightness(.9)}
+    .footer{background:var(--bg-light);text-align:center;padding:22px 0;margin-top:36px}
+    .footer-copy{font-size:.95rem;color:#666}
+    .footer-icons{position:fixed;left:20px;bottom:24px;display:flex;gap:12px;font-size:1.5rem;z-index:1200}
+    .footer-icons a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .footer-icons a.blog{color:#1EC800}
+    @media (max-width:520px){
+      .footer-icons{position:static;margin:10px 0 0 20px}
+      .close-btn{display:none}
     }
-    .project img:hover { transform: scale(1.03); }
-    .project-label { padding: 8px 0; font-weight: 500; }
-
-    /* Lightbox */
-    .lightbox {
-      display: none; position: fixed; inset: 0;
-      background: var(--bg-dark);
-      justify-content: center; align-items: center; flex-direction: column;
-      z-index: 2000;
+    .thumb.reveal{opacity:0;transform:scale(1.01)}
+    .thumb.reveal.in{opacity:1;transform:none;transition:opacity .48s ease,transform .48s ease}
+    @media (prefers-reduced-motion: reduce){
+      *{transition:none !important;animation:none !important}
+      .thumb.reveal{opacity:1;transform:none}
+      .project:hover .thumb{transform:none;filter:none}
+      .project:hover .project-label{transform:none}
     }
-    #lightbox-container {
-      position: relative; width: 90vw; max-width: 800px;
-      height: 70vh; max-height: 600px;
-      display: flex; justify-content: center; align-items: center;
-      overflow: hidden;
-    }
-    #lightbox-current, #lightbox-next { position: absolute; max-width: 100%; max-height: 100%; z-index: 1; }
-    .arrow {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      font-size: 2.5rem; color: var(--text-light); cursor: pointer; z-index: 2;
-    }
-    .arrow.left  { left: 12px; }
-    .arrow.right { right: 12px; }
-    .close-btn {
-      position: fixed; top: 16px; right: 16px;
-      font-size: 2rem; color: var(--text-light); cursor: pointer; z-index: 2100;
-    }
-    .dots { margin-top: 12px; display: flex; gap: 6px; }
-    .dots span {
-      width: 10px; height: 10px; background: #777;
-      border-radius: 50%; cursor: pointer; transition: background var(--transition-fast);
-    }
-    .dots span.active { background: var(--text-light); }
-
-    /* Contact Popup */
-    #contact-popup {
-      position: fixed; bottom: 20px; left: 20px;
-      width: 280px; max-width: 80%; background: var(--text-light);
-      border: 1px solid rgba(0,0,0,0.1); padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transform: translateX(-120%) translateY(120%); opacity: 0;
-      transition: transform .4s ease, opacity .4s ease;
-      z-index: 1500;
-    }
-    #contact-popup.open { transform: translateX(0) translateY(0); opacity: 1; }
-    #contact-popup .close-btn { position: absolute; top: 8px; right: 8px; font-size: 1.2rem; color: #333; cursor: pointer; }
-    #contact-popup input, #contact-popup textarea { width: 100%; margin-bottom: 8px; padding: 6px; font-size: 1rem; border: 1px solid #ddd; }
-    #contact-popup button { width: 100%; padding: 10px; background: var(--primary); color: var(--text-light); border: none; cursor: pointer; font-size: 1rem; }
-    #contact-popup button:hover { background: #777; }
-
-    /* Footer */
-    .footer { background: var(--bg-light); padding: 24px 0; margin-top: 40px; text-align: center; }
-    .footer-copy { font-size: .9rem; color: #666; }
-    .footer-icons { position: fixed; left: 20px; bottom: 24px; display: flex; gap: 12px; font-size: 1.5rem; }
-    .footer-icons a.instagram { background: linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .footer-icons a.blog { color: #1EC800; }
-
-    @media (max-width:768px) {
-      .projects-grid { grid-template-columns: 1fr; }
-      .close-btn { display: none; }
-      .footer-icons { position: static; margin: 8px 0 0 20px; transform: none; }
-    }
+    html{scrollbar-gutter:stable}
+    *{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.18) transparent}
+    *::-webkit-scrollbar{width:8px;height:8px}
+    *::-webkit-scrollbar-track{background:transparent}
+    *::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.12));border-radius:999px;border:2px solid rgba(255,255,255,0.8)}
+    *::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(0,0,0,0.22),rgba(0,0,0,0.18))}
+    .lightbox *::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.35),rgba(255,255,255,0.28));border:2px solid rgba(0,0,0,0.15)}
+    .lightbox *{scrollbar-color:rgba(255,255,255,0.35) transparent}
+    .dots{scrollbar-width:thin}
+    .dots::-webkit-scrollbar-thumb{border-width:1px}
   </style>
 </head>
 <body>
   <header class="header">
-    <nav class="nav">
+    <nav class="nav" aria-label="주요">
       <div class="logo">DIAMO</div>
       <ul class="nav-links">
-        <li><a href="#" id="contact-link">문의하기</a></li>
+        <li><a href="#" id="contact-link" aria-controls="contact-popup" aria-expanded="false">문의하기</a></li>
       </ul>
     </nav>
   </header>
@@ -122,119 +108,223 @@
     <p>Unrivaled Ocean Views</p>
   </section>
 
-  <section class="section">
-    <h2>Gallery</h2>
+  <section class="section" aria-labelledby="galleryTitle">
+    <h2 id="galleryTitle">Gallery</h2>
     <div class="projects-grid">
-      <div class="project" data-prefix="w">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/w/hw.jpg" alt="웨딩" loading="lazy">
+      <div class="project" data-prefix="w" tabindex="0" role="button" aria-label="웨딩 갤러리 열기">
+        <img class="thumb" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/w/hw.jpg" alt="웨딩" loading="lazy" decoding="async">
         <div class="project-label">웨딩</div>
       </div>
-      <div class="project" data-prefix="b">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/b/hb.jpg" alt="돌잔치" loading="lazy">
+      <div class="project" data-prefix="b" tabindex="0" role="button" aria-label="돌잔치 갤러리 열기">
+        <img class="thumb" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/b/hb.jpg" alt="돌잔치" loading="lazy" decoding="async">
         <div class="project-label">돌잔치</div>
       </div>
-      <div class="project" data-prefix="s">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/s/hs.jpg" alt="칠순팔순" loading="lazy">
-        <div class="project-label">칠순팔순</div>
+      <div class="project" data-prefix="s" tabindex="0" role="button" aria-label="칠순·팔순 갤러리 열기">
+        <img class="thumb" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/s/hs.jpg" alt="칠순·팔순" loading="lazy" decoding="async">
+        <div class="project-label">칠순·팔순</div>
       </div>
-      <div class="project" data-prefix="m">
-        <img src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/m/hm.jpg" alt="모임/세미나" loading="lazy">
+      <div class="project" data-prefix="m" tabindex="0" role="button" aria-label="모임/세미나 갤러리 열기">
+        <img class="thumb" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/m/hm.jpg" alt="모임/세미나" loading="lazy" decoding="async">
         <div class="project-label">모임/세미나</div>
+      </div>
+      <div class="project" data-prefix="f10" tabindex="0" role="button" aria-label="10층 뷔페 갤러리 열기">
+        <img class="thumb" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/f10/hf10.jpg" alt="10층 뷔페" loading="lazy" decoding="async">
+        <div class="project-label">10층 뷔페</div>
+      </div>
+      <div class="project" data-prefix="f3" tabindex="0" role="button" aria-label="3층 뷔페 갤러리 열기">
+        <img class="thumb" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/f3/hf3.jpg" alt="3층 뷔페" loading="lazy" decoding="async">
+        <div class="project-label">3층 뷔페</div>
       </div>
     </div>
   </section>
 
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
-    <span class="close-btn" id="closeBtn" aria-label="닫기">&times;</span>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="이미지 확대 보기">
+    <button class="close-btn" id="closeBtn" aria-label="닫기">&times;</button>
     <div id="lightbox-container">
-      <img id="lightbox-current" src="" alt="현재 이미지">
-      <img id="lightbox-next" src="" alt="" style="display:none;">
-      <div class="arrow left" id="prevBtn" aria-label="이전 이미지">&#10094;</div>
-      <div class="arrow right" id="nextBtn" aria-label="다음 이미지">&#10095;</div>
+      <img id="lightbox-current" src="" alt="확대 이미지">
+      <img id="lightbox-next" src="" alt="" style="display:none">
+      <button class="arrow left" id="prevBtn" aria-label="이전 이미지" type="button"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+      <button class="arrow right" id="nextBtn" aria-label="다음 이미지" type="button"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
     </div>
-    <div class="dots" id="lightbox-dots"></div>
+    <div class="dots" id="lightbox-dots" aria-label="페이지 표시 점"></div>
   </div>
 
-  <div id="contact-popup">
-    <span class="close-btn" onclick="closeContact()">&times;</span>
-    <h3>문의하기</h3>
-    <input type="text" placeholder="이름">
-    <input type="text" placeholder="전화번호">
-    <textarea placeholder="메시지를 입력하세요"></textarea>
+  <div id="contact-popup" role="dialog" aria-modal="true" aria-label="문의하기">
+    <button class="close-btn" onclick="closeContact()" aria-label="문의 닫기">&times;</button>
+    <h3 style="margin-bottom:8px">문의하기</h3>
+    <input type="text" placeholder="이름" aria-label="이름">
+    <input type="text" placeholder="전화번호" aria-label="전화번호">
+    <textarea placeholder="메시지를 입력하세요" rows="4" aria-label="메시지"></textarea>
     <button onclick="sendEmail()">전송하기</button>
   </div>
 
-  <div class="footer-icons">
-    <a href="https://www.instagram.com/_eldkah/" target="_blank" class="instagram"><i class="fab fa-instagram"></i></a>
-    <a href="https://m.blog.naver.com/qowlans1211" target="_blank" class="blog"><i class="fas fa-blog"></i></a>
+  <div class="footer-icons" aria-label="바로가기">
+    <a href="https://www.instagram.com/_eldkah/" target="_blank" rel="noreferrer noopener" class="instagram" aria-label="인스타그램 이동"><i class="fab fa-instagram"></i></a>
+    <a href="https://m.blog.naver.com/qowlans1211" target="_blank" rel="noreferrer noopener" class="blog" aria-label="네이버 블로그 이동"><i class="fas fa-blog"></i></a>
   </div>
   <footer class="footer">
     <div class="footer-copy">© 2025 DIAMO. All rights reserved.</div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      emailjs.init("YOUR_EMAILJS_USER_ID");
+  (() => {
+    const counts = { w:29, b:40, s:69, m:47, f10:24, f3:18 };
+    const exts = { w:'jpg', b:'jpg', s:'jpg', m:'jpg', f10:'jpg', f3:'jpg' };
+    const VISIBLE_DOTS = 7;
 
-      let galleryImages = [], galleryIndex = 0, isAnimating = false;
-      const counts = { w:29, b:40, s:69, m:47 }, VISIBLE_DOTS = 5;
+    const initEmail = () => { try { emailjs.init("YOUR_EMAILJS_USER_ID"); } catch(e){} };
 
-      function updateDots() {
-        const wrap = document.getElementById('lightbox-dots'); wrap.innerHTML = '';
-        const total = galleryImages.length;
-        const half  = Math.floor(VISIBLE_DOTS/2);
-        let start   = galleryIndex - half;
-        if (start < 0) start = 0;
-        if (start + VISIBLE_DOTS > total) start = Math.max(total - VISIBLE_DOTS, 0);
-        for (let i = 0; i < VISIBLE_DOTS; i++) { const idx = start + i; const dot = document.createElement('span'); if (idx===galleryIndex) dot.classList.add('active'); dot.onclick=() => showImage(idx); wrap.appendChild(dot); }
+    let galleryImages = [];
+    let galleryIndex  = 0;
+    let isAnimating   = false;
+    let swipe = { startX:0, endX:0, width:0, attached:false };
+
+    const lightbox    = document.getElementById('lightbox');
+    const lbContainer = document.getElementById('lightbox-container');
+    const imgCurr     = document.getElementById('lightbox-current');
+    const imgNext     = document.getElementById('lightbox-next');
+    const dotsWrap    = document.getElementById('lightbox-dots');
+    const prevBtn     = document.getElementById('prevBtn');
+    const nextBtn     = document.getElementById('nextBtn');
+    const closeBtn    = document.getElementById('closeBtn');
+    const contactLink = document.getElementById('contact-link');
+    const contactPopup= document.getElementById('contact-popup');
+
+    const makeURL = (prefix, i) => `https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i}).${exts[prefix]}`;
+
+    function updateDots(){
+      dotsWrap.innerHTML = '';
+      const total = galleryImages.length;
+      const half  = Math.floor(VISIBLE_DOTS/2);
+      let start   = Math.max(0, galleryIndex - half);
+      if (start + VISIBLE_DOTS > total) start = Math.max(total - VISIBLE_DOTS, 0);
+      const end   = Math.min(total, start + VISIBLE_DOTS);
+      for (let i = start; i < end; i++){
+        const dot = document.createElement('span');
+        if (i === galleryIndex) dot.classList.add('active');
+        dot.addEventListener('click', () => showImage(i), {passive:true});
+        dotsWrap.appendChild(dot);
       }
+    }
 
-      function showImage(idx) {
-        const curr = document.getElementById('lightbox-current'); curr.src = galleryImages[idx]; galleryIndex = idx; updateDots(); }
+    function showImage(idx){
+      galleryIndex = idx;
+      imgCurr.src = galleryImages[idx];
+      updateDots();
+    }
 
-      function slide(dir) {
-        if (isAnimating) return; isAnimating=true;
-        const curr=document.getElementById('lightbox-current'), nxt=document.getElementById('lightbox-next');
-        const newIdx=(galleryIndex+dir+galleryImages.length)%galleryImages.length;
-        nxt.src=galleryImages[newIdx]; nxt.style.display='block'; nxt.style.transition='none'; nxt.style.transform=`translateX(${dir>0?100:-100}%)`; nxt.style.opacity='0'; void nxt.offsetWidth;
-        curr.style.transition=`transform var(--transition-fast) ease-out, opacity var(--transition-fast) ease-out`;
-        nxt.style.transition=`transform var(--transition-fast) ease-out, opacity var(--transition-fast) ease-out`;
-        curr.style.transform=`translateX(${dir>0?-100:100}%)`; curr.style.opacity='0'; nxt.style.transform='translateX(0)'; nxt.style.opacity='1';
-        const onDone=(e)=>{ if(e.target===nxt&&e.propertyName==='transform'){ curr.src=nxt.src; curr.style.transition='none'; curr.style.transform='none'; curr.style.opacity='1'; nxt.style.display='none'; galleryIndex=newIdx; updateDots(); isAnimating=false; }};
-        nxt.addEventListener('transitionend',onDone,{once:true}); setTimeout(()=>{ if(isAnimating) onDone({target:nxt,propertyName:'transform'}); },400);
+    function slide(dir){
+      if (isAnimating || galleryImages.length <= 1) return;
+      isAnimating = true;
+      const newIdx = (galleryIndex + dir + galleryImages.length) % galleryImages.length;
+      imgNext.src  = galleryImages[newIdx];
+      imgNext.style.display = 'block';
+      imgNext.style.transition = 'none';
+      imgNext.style.transform  = `translateX(${dir>0?100:-100}%)`;
+      imgNext.style.opacity    = '0';
+      void imgNext.offsetWidth;
+      const trans = `transform var(--speed) ease-out, opacity var(--speed) ease-out`;
+      imgCurr.style.transition = trans;
+      imgNext.style.transition = trans;
+      imgCurr.style.transform = `translateX(${dir>0?-100:100}%)`;
+      imgCurr.style.opacity   = '0';
+      imgNext.style.transform = 'translateX(0)';
+      imgNext.style.opacity   = '1';
+      const finish = () => {
+        imgCurr.src = imgNext.src;
+        imgCurr.style.transition = 'none';
+        imgCurr.style.transform  = 'none';
+        imgCurr.style.opacity    = '1';
+        imgNext.style.display    = 'none';
+        galleryIndex = newIdx;
+        updateDots();
+        isAnimating = false;
+      };
+      imgNext.addEventListener('transitionend', e => { if (e.propertyName === 'transform') finish(); }, {once:true});
+      setTimeout(()=>{ if(isAnimating) finish(); }, 550);
+    }
+
+    function openGallery(prefix){
+      const total = counts[prefix] ?? 0;
+      if (total <= 0){ alert(`${prefix} 폴더에 표시할 이미지가 없습니다.`); return; }
+      galleryImages = Array.from({length: total}, (_, i) => makeURL(prefix, i+1));
+      galleryIndex  = 0;
+      imgCurr.style.transition = 'none';
+      imgNext.style.transition = 'none';
+      imgCurr.style.transform  = 'none';
+      imgNext.style.transform  = 'none';
+      imgCurr.style.opacity    = '1';
+      imgNext.style.opacity    = '0';
+      imgNext.style.display    = 'none';
+      showImage(0);
+      lightbox.setAttribute('aria-hidden','false');
+      lightbox.style.display='flex';
+      history.pushState({lightbox:true}, '');
+      if (!swipe.attached){
+        swipe.attached = true;
+        lbContainer.addEventListener('touchstart', e=>{ swipe.startX = e.touches[0].clientX; swipe.width = lbContainer.clientWidth; }, {passive:true});
+        lbContainer.addEventListener('touchmove', e=>{ swipe.endX = e.touches[0].clientX; }, {passive:true});
+        lbContainer.addEventListener('touchend', ()=>{ const diff = swipe.endX - swipe.startX; const threshold = Math.max(40, swipe.width * .18); if (Math.abs(diff) > threshold){ diff > 0 ? slide(-1) : slide(1); } }, {passive:true});
       }
+    }
 
-      function openGallery(prefix) {
-        const total=counts[prefix]; galleryImages=Array.from({length:total},(_,i)=>`https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i+1}).jpg`);
-        galleryIndex=0; const curr=document.getElementById('lightbox-current'), nxt=document.getElementById('lightbox-next');
-        [curr,nxt].forEach(el=>{el.style.transition='none'; el.style.transform='none'; el.style.opacity=el===curr?'1':'0'; el.src='';}); nxt.style.display='none'; showImage(0);
-        const lb=document.getElementById('lightbox-container');
-        let startX=0, endX=0;
-        lb.addEventListener('touchstart', e=> startX=e.touches[0].clientX);
-        lb.addEventListener('touchmove', e=> endX=e.touches[0].clientX);
-                lb.addEventListener('touchend', e=> {
-          const diff = endX - startX;
-          const threshold = lb.clientWidth * 0.2; // 인스타그램 수준의 민감도 (화면 너비의 20%)
-          if (Math.abs(diff) > threshold) {
-            diff > 0 ? slide(-1) : slide(1);
-          }
+    function closeLightbox(){
+      lightbox.setAttribute('aria-hidden','true');
+      lightbox.style.display = 'none';
+      if (history.state && history.state.lightbox) history.back();
+    }
+
+    function initRevealOnScroll(){
+      const thumbs = document.querySelectorAll('.thumb');
+      thumbs.forEach(img => img.classList.add('reveal'));
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce){ thumbs.forEach(img => img.classList.add('in')); return; }
+      const io = new IntersectionObserver((entries, obs)=>{
+        entries.forEach(e=>{
+          if (e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }
         });
-        document.getElementById('lightbox').style.display='flex'; history.pushState({lightboxOpen:true},'', '');
-      }
+      }, { threshold: .15 });
+      thumbs.forEach(img => io.observe(img));
+    }
 
-      function closeLightbox(){ document.getElementById('lightbox').style.display='none'; if(history.state?.lightboxOpen) history.back(); }
+    function bindOnce(){
+      document.querySelectorAll('.project').forEach(el=>{
+        const prefix = el.dataset.prefix;
+        el.addEventListener('click', ()=> openGallery(prefix));
+        el.addEventListener('keydown', e=>{ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openGallery(prefix); } });
+      });
+      prevBtn.addEventListener('click', ()=> slide(-1));
+      nextBtn.addEventListener('click', ()=> slide(1));
+      closeBtn.addEventListener('click', closeLightbox);
+      document.addEventListener('keydown', e=>{
+        const visible = lightbox.getAttribute('aria-hidden') === 'false';
+        if (!visible) return;
+        if (e.key === 'ArrowLeft')  slide(-1);
+        if (e.key === 'ArrowRight') slide(1);
+        if (e.key === 'Escape')     closeLightbox();
+      });
+      window.addEventListener('popstate', ()=>{
+        if (lightbox.getAttribute('aria-hidden') === 'false') closeLightbox();
+        closeContact();
+      });
+      contactLink.addEventListener('click', e=>{
+        e.preventDefault();
+        const willOpen = !contactPopup.classList.contains('open');
+        contactPopup.classList.toggle('open');
+        contactLink.setAttribute('aria-expanded', String(willOpen));
+      });
+      initEmail();
+    }
 
-      document.querySelectorAll('.project').forEach(el=>el.onclick=()=>openGallery(el.dataset.prefix));
-      document.getElementById('prevBtn').onclick=()=>slide(-1);
-      document.getElementById('nextBtn').onclick=()=>slide(1);
-      document.getElementById('closeBtn').onclick=closeLightbox;
-      window.onpopstate=()=>{ if(document.getElementById('lightbox').style.display==='flex') closeLightbox(); };
-      document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeLightbox(); document.getElementById('contact-popup').classList.remove('open'); } });
-      document.getElementById('contact-link').onclick=e=>{ e.preventDefault(); document.getElementById('contact-popup').classList.toggle('open'); };
+    document.addEventListener('DOMContentLoaded', () => {
+      bindOnce();
+      initRevealOnScroll();
     });
-    function closeContact(){document.getElementById('contact-popup').classList.remove('open');}
-    function sendEmail(){alert('전송 로직을 구현하세요');}
+
+    window.closeContact = function(){ contactPopup.classList.remove('open'); contactLink.setAttribute('aria-expanded','false'); };
+    window.sendEmail = function(){ alert('전송 로직을 구현하세요 (EmailJS 등)'); };
+  })();
   </script>
 </body>
 </html>
