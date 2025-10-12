@@ -4,15 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DIAMO Gallery</title>
-
-  <!-- 네트워크 예열: 외부 리소스 프리커넥트 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
@@ -49,7 +45,6 @@
     .projects-grid{display:grid;grid-template-columns: repeat(auto-fit, minmax(var(--card-min), 1fr));gap:var(--gap)}
     .project{
       background:transparent;border:none;border-radius:var(--radius);overflow:hidden;cursor:pointer;outline:none;box-shadow:none;transition:transform var(--speed);
-      /* 성능 튜닝: 화면 밖 카드 지연 계산 (시각 변화 없음) */
       content-visibility:auto;
       contain-intrinsic-size:300px 225px;
     }
@@ -65,24 +60,27 @@
       position:relative;
       aspect-ratio: 4 / 3;
       width: min(96vw, calc(88dvh * 4 / 3), 2200px);
-      height: auto;
       display:flex;align-items:center;justify-content:center;overflow:hidden;
       border-radius: clamp(8px, 1.2vw, 20px);
       box-shadow: 0 10px 40px rgba(0,0,0,.35);
-      outline:none
+      outline:none;
+      touch-action: pan-y;
+      background: rgba(0,0,0,.1);
     }
     #lightbox-current,#lightbox-next{position:absolute;inset:auto;max-width:100%;max-height:100%;object-fit:contain;will-change:transform,opacity}
     .arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2050;background:rgba(0,0,0,.35);border:0;color:var(--text-inv);font-size:clamp(1.3rem, 3.8vw, 2.6rem);width:clamp(36px, 6vw, 60px);height:clamp(36px, 6vw, 60px);border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:background var(--speed)}
     .arrow:hover{background:rgba(0,0,0,.5)}
     .arrow.left{left:10px}
     .arrow.right{right:10px}
+    @media (pointer: coarse), (max-width: 640px){
+      .arrow{display:none}
+    }
     .dots{margin-top:10px;display:flex;gap:6px;overflow:auto;padding:4px 10px;max-width:var(--container)}
     .dots::-webkit-scrollbar{height:6px}
     .dots span{min-width:10px;height:10px;background:#888;border-radius:50%;cursor:pointer;transition:background var(--speed),transform var(--speed)}
     .dots span.active{background:#fff;transform:scale(1.15)}
     #contact-popup{position:fixed;bottom:20px;left:20px;z-index:1500;width:min(340px, 90vw);background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);transform: translate(-120%, 120%);opacity:0;transition: transform .38s ease, opacity .38s ease}
     #contact-popup.open{transform:none;opacity:1}
-    #contact-popup .close-btn{position:absolute;top:8px;right:10px;color:#333}
     #contact-popup input,#contact-popup textarea{width:100%;margin-bottom:8px;padding:10px;border-radius:10px;border:1px solid #e6e6e6;font-size:1rem}
     #contact-popup button{width:100%;padding:10px 12px;border:0;color:#fff;background:var(--primary);border-radius:10px;cursor:pointer}
     #contact-popup button:hover{filter:brightness(.9)}
@@ -113,6 +111,22 @@
     .lightbox *{scrollbar-color:rgba(255,255,255,0.35) transparent}
     .dots{scrollbar-width:thin}
     .dots::-webkit-scrollbar-thumb{border-width:1px}
+    #popup-permission[hidden]{display:none}
+    #popup-permission{
+      position:fixed;left:0;right:0;bottom:0;z-index:2500;
+      background:rgba(20,20,20,.92);color:#fff;
+      padding:14px 18px; box-shadow:0 -8px 24px rgba(0,0,0,.25);
+    }
+    #popup-permission .pp-wrap{max-width:var(--container);margin:0 auto}
+    #popup-permission strong{display:block;font-size:1.05rem;margin-bottom:6px}
+    #popup-permission p{font-size:.95rem;opacity:.9;margin-bottom:10px}
+    #popup-permission .pp-actions{display:flex;gap:10px;flex-wrap:wrap}
+    #popup-permission .pp-actions button{
+      border:0; border-radius:10px; padding:8px 12px; cursor:pointer;
+      background:#fff;color:#111;font-weight:600;
+    }
+    #popup-permission #pp-help{background:#e9e9e9}
+    #popup-permission #pp-close{background:#444;color:#fff;font-weight:500}
   </style>
 </head>
 <body>
@@ -134,7 +148,6 @@
     <h2 id="galleryTitle">Gallery</h2>
     <div class="projects-grid">
       <div class="project" data-prefix="w" tabindex="0" role="button" aria-label="웨딩 갤러리 열기">
-        <!-- 첫 썸네일만 LCP 향상용 eager/high (시각 동일) -->
         <img class="thumb" src="https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/w/hw.jpg" alt="웨딩" loading="eager" fetchpriority="high" decoding="async">
         <div class="project-label">웨딩</div>
       </div>
@@ -173,12 +186,23 @@
   </div>
 
   <div id="contact-popup" role="dialog" aria-modal="true" aria-label="문의하기">
-    <button class="close-btn" onclick="closeContact()" aria-label="문의 닫기">&times;</button>
     <h3 style="margin-bottom:8px">문의하기</h3>
     <input type="text" placeholder="이름" aria-label="이름">
     <input type="text" placeholder="전화번호" aria-label="전화번호">
     <textarea placeholder="메시지를 입력하세요" rows="4" aria-label="메시지"></textarea>
     <button onclick="sendEmail()">전송하기</button>
+  </div>
+
+  <div id="popup-permission" role="alertdialog" aria-modal="true" aria-live="assertive" aria-label="팝업 차단 안내" hidden>
+    <div class="pp-wrap">
+      <strong>팝업이 차단되었습니다.</strong>
+      <p>브라우저 설정에서 이 사이트의 팝업을 허용해 주세요. 허용 후 아래 버튼으로 다시 시도할 수 있어요.</p>
+      <div class="pp-actions">
+        <button type="button" id="pp-try">다시 시도</button>
+        <button type="button" id="pp-help">브라우저별 허용 방법</button>
+        <button type="button" id="pp-close" aria-label="안내 닫기">닫기</button>
+      </div>
+    </div>
   </div>
 
   <div class="footer-icons" aria-label="바로가기">
@@ -192,17 +216,10 @@
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js" defer></script>
   <script>
   (() => {
+    const EMAILJS = { publicKey:'9YqLj0sQHeKA9XkIJ', serviceId:'service_12ehn7t', templateId:'template_2jcmp9n' };
     const counts = { w:29, b:40, s:69, m:52, f10:24, f3:18 };
-    const exts = { w:'jpg', b:'jpg', s:'jpg', m:'jpg', f10:'jpg', f3:'jpg' };
+    const exts   = { w:'jpg', b:'jpg', s:'jpg', m:'jpg', f10:'jpg', f3:'jpg' };
     const VISIBLE_DOTS = 7;
-
-    // EmailJS 초기화는 유휴 시간에
-    const initEmail = () => { try { emailjs.init("YOUR_EMAILJS_USER_ID"); } catch(e){} };
-
-    let galleryImages = [];
-    let galleryIndex  = 0;
-    let isAnimating   = false;
-    let swipe = { startX:0, endX:0, width:0, attached:false };
 
     const lightbox    = document.getElementById('lightbox');
     const lbContainer = document.getElementById('lightbox-container');
@@ -214,6 +231,24 @@
     const closeBtn    = document.getElementById('closeBtn');
     const contactLink = document.getElementById('contact-link');
     const contactPopup= document.getElementById('contact-popup');
+
+    const initEmail = () => { try { emailjs.init(EMAILJS.publicKey); } catch(e){} };
+
+    function closeLightbox(){
+      lightbox.setAttribute('aria-hidden','true');
+      lightbox.style.display = 'none';
+      if (history.state && history.state.lightbox) history.back();
+    }
+    function closeContact(){
+      contactPopup.classList.remove('open');
+      contactLink.setAttribute('aria-expanded','false');
+    }
+    window.closeContact = closeContact;
+
+    let galleryImages = [];
+    let galleryIndex  = 0;
+    let isAnimating   = false;
+    let swipe = { startX:0, endX:0, startY:0, endY:0, width:0, attached:false };
 
     const makeURL = (prefix, i) => `https://raw.githubusercontent.com/Lamanujan/Diamo/main/images/${prefix}/${prefix} (${i}).${exts[prefix]}`;
 
@@ -232,19 +267,18 @@
       }
     }
 
-    // ▲ 새로 추가: 앞/뒤 이미지 미리 받기 (체감 즉시성 향상)
     function prefetchAround(idx){
       if (!galleryImages.length) return;
-      const prev = (idx - 1 + galleryImages.length) % galleryImages.length;
-      const next = (idx + 1) % galleryImages.length;
-      [prev, next].forEach(i => { const im = new Image(); im.loading = "eager"; im.src = galleryImages[i]; });
+      const p = (idx - 1 + galleryImages.length) % galleryImages.length;
+      const n = (idx + 1) % galleryImages.length;
+      [p, n].forEach(i => { const im = new Image(); im.loading = "eager"; im.src = galleryImages[i]; });
     }
 
     function showImage(idx){
       galleryIndex = idx;
       imgCurr.src = galleryImages[idx];
       updateDots();
-      prefetchAround(idx); // ▲ 추가 호출
+      prefetchAround(idx);
     }
 
     function slide(dir){
@@ -273,7 +307,7 @@
         galleryIndex = newIdx;
         updateDots();
         isAnimating = false;
-        prefetchAround(galleryIndex); // 전환 후에도 주변 프리페치
+        prefetchAround(galleryIndex);
       };
       imgNext.addEventListener('transitionend', e => { if (e.propertyName === 'transform') finish(); }, {once:true});
       setTimeout(()=>{ if(isAnimating) finish(); }, 550);
@@ -297,16 +331,28 @@
       history.pushState({lightbox:true}, '');
       if (!swipe.attached){
         swipe.attached = true;
-        lbContainer.addEventListener('touchstart', e=>{ swipe.startX = e.touches[0].clientX; swipe.width = lbContainer.clientWidth; }, {passive:true});
-        lbContainer.addEventListener('touchmove', e=>{ swipe.endX = e.touches[0].clientX; }, {passive:true});
-        lbContainer.addEventListener('touchend', ()=>{ const diff = swipe.endX - swipe.startX; const threshold = Math.max(40, swipe.width * .18); if (Math.abs(diff) > threshold){ diff > 0 ? slide(-1) : slide(1); } }, {passive:true});
+        lbContainer.addEventListener('touchstart', e=>{
+          const t = e.touches[0];
+          swipe.startX = t.clientX;
+          swipe.endX   = t.clientX;
+          swipe.startY = t.clientY;
+          swipe.endY   = t.clientY;
+          swipe.width  = lbContainer.clientWidth;
+        }, {passive:true});
+        lbContainer.addEventListener('touchmove', e=>{
+          const t = e.touches[0];
+          swipe.endX = t.clientX;
+          swipe.endY = t.clientY;
+        }, {passive:true});
+        lbContainer.addEventListener('touchend', ()=>{
+          const dx = swipe.endX - swipe.startX;
+          const dy = swipe.endY - swipe.startY;
+          const threshold = Math.max(40, swipe.width * .18);
+          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold){
+            dx > 0 ? slide(-1) : slide(1);
+          }
+        }, {passive:true});
       }
-    }
-
-    function closeLightbox(){
-      lightbox.setAttribute('aria-hidden','true');
-      lightbox.style.display = 'none';
-      if (history.state && history.state.lightbox) history.back();
     }
 
     function initRevealOnScroll(){
@@ -349,9 +395,18 @@
         contactPopup.classList.toggle('open');
         contactLink.setAttribute('aria-expanded', String(willOpen));
       });
+      document.addEventListener('click', (e) => {
+        const isOpen = contactPopup.classList.contains('open');
+        if (!isOpen) return;
+        const insidePopup = contactPopup.contains(e.target);
+        const onToggle    = e.target === contactLink || contactLink.contains(e.target);
+        if (!insidePopup && !onToggle) closeContact();
+      }, { capture: true });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && contactPopup.classList.contains('open')) closeContact();
+      });
     }
 
-    // 초기화: 메인 렌더 후, 브라우저가 한가할 때 부가 작업 실행
     document.addEventListener('DOMContentLoaded', () => {
       bindOnce();
       if ('requestIdleCallback' in window) {
@@ -363,8 +418,86 @@
       }
     });
 
-    window.closeContact = function(){ contactPopup.classList.remove('open'); contactLink.setAttribute('aria-expanded','false'); };
-    window.sendEmail = function(){ alert('전송 로직을 구현하세요 (EmailJS 등)'); };
+    (function(){
+      const banner   = document.getElementById('popup-permission');
+      const btnTry   = document.getElementById('pp-try');
+      const btnHelp  = document.getElementById('pp-help');
+      const btnClose = document.getElementById('pp-close');
+
+      function isPopupBlocked(win){
+        return !win || win.closed || typeof win.closed === 'undefined';
+      }
+      function showBanner(){ banner.hidden = false; }
+      function hideBanner(){ banner.hidden = true; }
+      function showHelp(){
+        alert('팝업 허용 방법(요약)\n- Chrome: 주소창 오른쪽 팝업 아이콘 또는 사이트 정보(자물쇠) > 사이트 설정 > 팝업/리디렉션 허용\n- Edge: 사이트 정보(자물쇠) > 사이트 권한 > 팝업/리디렉션 허용\n- Safari(macOS): Safari > 설정 > 웹사이트 > 팝업 윈도우 > 해당 사이트 허용\n- 모바일 브라우저도 유사한 위치에 팝업/리디렉션 항목이 있습니다.');
+      }
+      if (btnHelp)  btnHelp.addEventListener('click', showHelp);
+      if (btnClose) btnClose.addEventListener('click', hideBanner);
+
+      window.tryOpenPopup = function(openFn){
+        try{
+          const test = window.open('', '', 'width=1,height=1,left=-10000,top=-10000');
+          if (isPopupBlocked(test)){
+            showBanner();
+            if (btnTry) btnTry.onclick = () => { hideBanner(); if (openFn) openFn(); };
+            return false;
+          } else {
+            test.close();
+            if (openFn) openFn();
+            return true;
+          }
+        }catch(e){
+          showBanner();
+          return false;
+        }
+      };
+    })();
+
+    window.sendEmail = async function(){
+      const popup = document.getElementById('contact-popup');
+      const inputs = popup.querySelectorAll('input, textarea');
+      const nameEl = popup.querySelector('input[aria-label="이름"]');
+      const phoneEl = popup.querySelector('input[aria-label="전화번호"]');
+      const msgEl = popup.querySelector('textarea[aria-label="메시지"]');
+      const submitBtn = popup.querySelector('button');
+
+      const name = (nameEl?.value || '').trim();
+      const phone = (phoneEl?.value || '').trim();
+      const message = (msgEl?.value || '').trim();
+
+      if (!name || !phone || !message){
+        alert('이름, 전화번호, 메시지를 모두 입력해주세요.');
+        return;
+      }
+
+      inputs.forEach(el => el.disabled = true);
+      submitBtn.disabled = true;
+      const prevText = submitBtn.textContent;
+      submitBtn.textContent = '전송 중...';
+
+      try{
+        await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, {
+          name,
+          from_name: name,
+          contact_number: phone,
+          message,
+          page_url: location.href,
+          user_agent: navigator.userAgent,
+          sent_at: new Date().toISOString()
+        });
+        submitBtn.textContent = '전송 완료';
+        alert('문의가 정상 접수되었습니다. 곧 연락드리겠습니다.');
+        nameEl.value = ''; phoneEl.value = ''; msgEl.value = '';
+        closeContact();
+      } catch (err){
+        alert('전송에 실패했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.');
+        submitBtn.textContent = prevText;
+      } finally{
+        inputs.forEach(el => el.disabled = false);
+        submitBtn.disabled = false;
+      }
+    };
   })();
   </script>
 </body>
