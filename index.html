@@ -34,9 +34,41 @@
     .header{position:sticky;top:0;z-index:1000;background:var(--bg-light);backdrop-filter:saturate(150%) blur(6px)}
     .nav{width:var(--container);margin-inline:auto;display:flex;align-items:center;justify-content:space-between;padding:10px 2px}
     .logo{font-size:clamp(1.15rem, 2.6vw, 2rem);font-weight:700;letter-spacing:.02em}
+
+    /* 왼쪽: 로고 + 언어 버튼 */
+    .nav-left{
+      display:flex;
+      align-items:center;
+      gap:16px; /* 로고와 언어 버튼 간격 */
+    }
+
     .nav-links{list-style:none;display:flex;gap:14px}
     .nav-links a{padding:6px 10px;border-radius:8px;transition:background var(--speed)}
     .nav-links a:hover{background:rgba(0,0,0,.06)}
+
+    /* 언어 버튼 */
+    .lang-switch{
+      list-style:none;
+      display:flex;
+      gap:3px;
+    }
+    .lang-switch button{
+      background:transparent;
+      border:0;
+      padding:6px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      font:inherit;
+      color:inherit;
+      transition:background var(--speed);
+    }
+    .lang-switch button:hover{
+      background:rgba(0,0,0,.06);
+    }
+    .lang-switch button.active{
+      background:rgba(0,0,0,.08);
+    }
+
     .hero{background:#e9e9e9;text-align:center;padding:clamp(36px,8vw,120px) 16px}
     .hero h1{font-size:clamp(1.4rem, 5vw, 3.4rem);margin-bottom:8px}
     .hero p{font-size:clamp(.9rem, 2.2vw, 1.3rem);opacity:.85}
@@ -79,6 +111,7 @@
     .dots::-webkit-scrollbar{height:6px}
     .dots span{min-width:10px;height:10px;background:#888;border-radius:50%;cursor:pointer;transition:background var(--speed),transform var(--speed)}
     .dots span.active{background:#fff;transform:scale(1.15)}
+
     #contact-popup{position:fixed;bottom:20px;left:20px;z-index:1500;width:min(340px, 90vw);background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);transform: translate(-120%, 120%);opacity:0;transition: transform .38s ease, opacity .38s ease}
     #contact-popup.open{transform:none;opacity:1}
     #contact-popup input,#contact-popup textarea{width:100%;margin-bottom:8px;padding:10px;border-radius:10px;border:1px solid #e6e6e6;font-size:1rem}
@@ -132,7 +165,17 @@
 <body>
   <header class="header">
     <nav class="nav" aria-label="주요">
-      <div class="logo">DIAMO</div>
+      <!-- 왼쪽: DIAMO 로고 + 언어 버튼 -->
+      <div class="nav-left">
+        <div class="logo">DIAMO</div>
+        <ul class="lang-switch" aria-label="언어 선택">
+          <li><button type="button" data-lang="ko" class="active">KO</button></li>
+          <li><button type="button" data-lang="en">EN</button></li>
+          <li><button type="button" data-lang="jp">JP</button></li>
+          <li><button type="button" data-lang="cn">CN</button></li>
+        </ul>
+      </div>
+      <!-- 오른쪽: 문의하기 -->
       <ul class="nav-links">
         <li><a href="#" id="contact-link" aria-controls="contact-popup" aria-expanded="false">문의하기</a></li>
       </ul>
@@ -186,11 +229,11 @@
   </div>
 
   <div id="contact-popup" role="dialog" aria-modal="true" aria-label="문의하기">
-    <h3 style="margin-bottom:8px">문의하기</h3>
-    <input type="text" placeholder="이름" aria-label="이름">
-    <input type="text" placeholder="전화번호" aria-label="전화번호">
-    <textarea placeholder="메시지를 입력하세요" rows="4" aria-label="메시지"></textarea>
-    <button onclick="sendEmail()">전송하기</button>
+    <h3 id="contact-title" style="margin-bottom:8px">문의하기</h3>
+    <input id="contact-name" type="text" placeholder="이름" aria-label="이름">
+    <input id="contact-phone" type="text" placeholder="전화번호" aria-label="전화번호">
+    <textarea id="contact-message" placeholder="메시지를 입력하세요" rows="4" aria-label="메시지를 입력하세요"></textarea>
+    <button id="contact-submit" onclick="sendEmail()">전송하기</button>
   </div>
 
   <div id="popup-permission" role="alertdialog" aria-modal="true" aria-live="assertive" aria-label="팝업 차단 안내" hidden>
@@ -233,6 +276,87 @@
     const contactPopup= document.getElementById('contact-popup');
 
     const initEmail = () => { try { emailjs.init(EMAILJS.publicKey); } catch(e){} };
+
+    /* ── 다국어 텍스트 정의 ───────────────────────── */
+    const I18N = {
+      ko: {
+        gallery: ['웨딩','돌잔치','칠순·팔순','모임/세미나','10층 뷔페','3층 뷔페'],
+        contactLink: '문의하기',
+        contactTitle: '문의하기',
+        namePlaceholder: '이름',
+        phonePlaceholder: '전화번호',
+        messagePlaceholder: '메시지를 입력하세요',
+        submitText: '전송하기'
+      },
+      en: {
+        gallery: ['Wedding','1st Birthday','70th·80th','Events / Seminar','10F Buffet','3F Buffet'],
+        contactLink: 'Contact',
+        contactTitle: 'Contact',
+        namePlaceholder: 'Name',
+        phonePlaceholder: 'Phone Number',
+        messagePlaceholder: 'Please enter your message',
+        submitText: 'Send'
+      },
+      jp: {
+        gallery: ['ウェディング','1歳誕生日','古希・傘寿','会食 / セミナー','10階ビュッフェ','3階ビュッフェ'],
+        contactLink: 'お問い合わせ',
+        contactTitle: 'お問い合わせ',
+        namePlaceholder: 'お名前',
+        phonePlaceholder: '電話番号',
+        messagePlaceholder: 'メッセージをご入力ください',
+        submitText: '送信'
+      },
+      cn: {
+        gallery: ['婚礼','周岁宴','古稀·八十寿宴','聚会 / 说明会','10层自助餐','3层自助餐'],
+        contactLink: '咨询',
+        contactTitle: '咨询',
+        namePlaceholder: '姓名',
+        phonePlaceholder: '电话',
+        messagePlaceholder: '请输入您的留言',
+        submitText: '发送'
+      }
+    };
+
+    function setLanguage(lang){
+      const dict = I18N[lang] || I18N.ko;
+
+      // Gallery 라벨
+      const labels = document.querySelectorAll('.project-label');
+      labels.forEach((el, idx) => {
+        if (dict.gallery[idx]) el.textContent = dict.gallery[idx];
+      });
+
+      // 헤더 문의하기
+      if (contactLink) contactLink.textContent = dict.contactLink;
+
+      // 팝업 내부 텍스트들
+      const titleEl  = document.getElementById('contact-title');
+      const nameEl   = document.getElementById('contact-name');
+      const phoneEl  = document.getElementById('contact-phone');
+      const msgEl    = document.getElementById('contact-message');
+      const submitEl = document.getElementById('contact-submit');
+
+      if (titleEl)  titleEl.textContent = dict.contactTitle;
+      if (contactPopup) contactPopup.setAttribute('aria-label', dict.contactTitle);
+      if (nameEl){
+        nameEl.placeholder = dict.namePlaceholder;
+        nameEl.setAttribute('aria-label', dict.namePlaceholder);
+      }
+      if (phoneEl){
+        phoneEl.placeholder = dict.phonePlaceholder;
+        phoneEl.setAttribute('aria-label', dict.phonePlaceholder);
+      }
+      if (msgEl){
+        msgEl.placeholder = dict.messagePlaceholder;
+        msgEl.setAttribute('aria-label', dict.messagePlaceholder);
+      }
+      if (submitEl) submitEl.textContent = dict.submitText;
+
+      // 활성 언어 버튼 표시
+      document.querySelectorAll('.lang-switch button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+    }
 
     function closeLightbox(){
       lightbox.setAttribute('aria-hidden','true');
@@ -405,6 +529,16 @@
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && contactPopup.classList.contains('open')) closeContact();
       });
+
+      // 언어 버튼 클릭 처리
+      document.querySelectorAll('.lang-switch button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setLanguage(btn.dataset.lang);
+        });
+      });
+
+      // 기본 언어: 한국어
+      setLanguage('ko');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -457,10 +591,10 @@
     window.sendEmail = async function(){
       const popup = document.getElementById('contact-popup');
       const inputs = popup.querySelectorAll('input, textarea');
-      const nameEl = popup.querySelector('input[aria-label="이름"]');
-      const phoneEl = popup.querySelector('input[aria-label="전화번호"]');
-      const msgEl = popup.querySelector('textarea[aria-label="메시지"]');
-      const submitBtn = popup.querySelector('button');
+      const nameEl = document.getElementById('contact-name');
+      const phoneEl = document.getElementById('contact-phone');
+      const msgEl = document.getElementById('contact-message');
+      const submitBtn = document.getElementById('contact-submit');
 
       const name = (nameEl?.value || '').trim();
       const phone = (phoneEl?.value || '').trim();
